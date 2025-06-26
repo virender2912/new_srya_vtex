@@ -11,6 +11,10 @@ import { useCart } from "@/contexts/cart-context"
 import { useWishlist } from "@/contexts/wishlist-context"
 import { useAuth } from "@/contexts/auth-context"
 import { LiveSearch } from "@/components/live-search"
+import Header from "./header"
+import LanguageToggle from "./language-toggle" 
+import { useTranslation } from "@/hooks/use-translation"
+import { useLanguage } from "@/contexts/language-context"
 
 interface LayoutProps {
   children: React.ReactNode
@@ -20,6 +24,8 @@ export function Layout({ children }: LayoutProps) {
   const { state: cartState, toggleCart } = useCart()
   const { state: wishlistState } = useWishlist()
   const { state: authState, logout } = useAuth()
+  const { t } = useTranslation()
+  const { isRTL } = useLanguage()
 
   return (
     <div className="min-h-screen bg-background">
@@ -98,19 +104,19 @@ export function Layout({ children }: LayoutProps) {
           {/* Desktop navigation */}
           <nav className="hidden md:flex items-center space-x-8 text-sm font-medium tracking-wide">
             <Link href="/category/nike" className="transition-colors hover:text-primary uppercase">
-             Nike
+             {t("Nike")}
             </Link>
             <Link href="/category/mens" className="transition-colors hover:text-primary uppercase">
-              Men's
-            </Link>
+            {t("mens")}
+            </Link> 
             <Link href="/category/scarf" className="transition-colors hover:text-primary uppercase">
-              Accessories
+            {t("accessories")}
             </Link>
             <Link href="/category/nike" className="transition-colors hover:text-primary uppercase">
-              Shoes
+            {t("shoes")}
             </Link>
             <Link href="/category/sale" className="transition-colors hover:text-red-600 uppercase text-red-600">
-              Sale
+            {t("sale")}
             </Link>
           </nav>
 
@@ -168,6 +174,13 @@ export function Layout({ children }: LayoutProps) {
               )}
               <span className="sr-only">Shopping cart</span>
             </Button>
+            {/* Right side actions */}
+                      <div className="flex items-center space-x-4">
+                        <LanguageToggle />
+                        <Button variant="ghost" size="sm" className="md:hidden">
+                          <Menu className="h-5 w-5" />
+                        </Button>
+                      </div>
           </div>
         </div>
       </header>
