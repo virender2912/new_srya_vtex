@@ -11,10 +11,11 @@ import { useCart } from "@/contexts/cart-context"
 import { useWishlist } from "@/contexts/wishlist-context"
 import { useAuth } from "@/contexts/auth-context"
 import { LiveSearch } from "@/components/live-search"
-import Header from "./header"
 import LanguageToggle from "./language-toggle" 
 import { useTranslation } from "@/hooks/use-translation"
 import { useLanguage } from "@/contexts/language-context"
+
+
 
 interface LayoutProps {
   children: React.ReactNode
@@ -26,9 +27,10 @@ export function Layout({ children }: LayoutProps) {
   const { state: authState, logout } = useAuth()
   const { t } = useTranslation()
   const { isRTL } = useLanguage()
-
+ 
   return (
     <div className="min-h-screen bg-background">
+   
       {/* Top Banner */}
       <div className="bg-black text-white text-center py-2 text-sm">
         <p>Free shipping on orders over $75 | New arrivals weekly</p>
@@ -38,7 +40,7 @@ export function Layout({ children }: LayoutProps) {
       <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
         <div className="container flex h-20 items-center">
           {/* Mobile menu */}
-          <Sheet>
+          <Sheet> 
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="md:hidden">
                 <Menu className="h-5 w-5" />

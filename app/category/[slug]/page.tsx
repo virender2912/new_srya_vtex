@@ -59,7 +59,7 @@ export default function CategoryPage() {
           const result = await productsResponse.json()
           setProducts(result.products)
           setFilteredProducts(result.products)
-
+console.log("test", result);
           // Extract unique brands
           const brands = [...new Set(result.products.map((p: VtexProduct) => p.brand))] as string[];
           setAvailableBrands(brands)

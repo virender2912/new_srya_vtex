@@ -90,8 +90,8 @@ export default function HomePage() {
       try {
         const [featuredRes, newArrivalsRes, saleRes] = await Promise.all([
           fetch("/api/products?pageSize=8"),
-          fetch("/api/products?pageSize=6"),
-          fetch("/api/products?pageSize=6"),
+          fetch("/api/products?pageSize=8"),
+          fetch("/api/products?pageSize=8"),
         ])
 
         if (featuredRes.ok) {

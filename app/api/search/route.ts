@@ -19,6 +19,7 @@ export async function GET(request: NextRequest) {
     }
 
     const result = await searchProducts(query, page, pageSize)
+    console.log("query",query)
     return NextResponse.json({
       ...result,
       query,

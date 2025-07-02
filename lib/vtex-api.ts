@@ -173,11 +173,18 @@ export async function searchProducts(query: string, page = 1, pageSize = 12): Pr
     throw new Error("VTEX configuration not found. Please set up your environment variables.")
   }
 
+
+
   const from = (page - 1) * pageSize
   const to = from + pageSize - 1
-
+  
+  // Clean and validate the query
+  const cleanQuery = query.trim()
+  
+  console.log('Searching with query:', cleanQuery)
+   
   const response = await fetch(
-    `${BASE_URL}/api/catalog_system/pub/products/search?ft=${encodeURIComponent(query)}&_from=${from}&_to=${to}`,
+    `${BASE_URL}/api/catalog_system/pub/products/search?ft=${encodeURIComponent(cleanQuery)}`,
     {
       headers: {
         "Content-Type": "application/json",
@@ -231,6 +238,7 @@ export async function getProductById(productId: string): Promise<VtexProduct> {
 
   return products[0]
 }
+
 
 export async function getProductBySlug(slug: string): Promise<VtexProduct> {
   // Check if VTEX configuration is available
@@ -317,3 +325,4 @@ export function isProductAvailable(sku: VtexSku): boolean {
   const seller = sku.sellers.find((s) => s.sellerDefault) || sku.sellers[0]
   return seller?.commertialOffer?.IsAvailable || false
 }
+
