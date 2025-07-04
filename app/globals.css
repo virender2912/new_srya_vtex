@@ -99,3 +99,40 @@ body {
       margin: 0 auto;
   }
 }
+
+
+
+/* CUSTOM CSS START VSB */
+.categories-section .coltnbtn {
+    color: #FFFFF0;
+}
+
+
+
+/* globals.css */
+
+
+
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('/fonts/playfair-display.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Montserrat';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/montserrat.woff2') format('woff2');
+}
+
+body, p, li, a, span, button {
+  font-family: 'Montserrat', sans-serif;
+}
+
+h1, h2, h3, h3, h4, h5, h6 {
+  font-family: 'Playfair Display', serif;
+}

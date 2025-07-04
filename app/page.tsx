@@ -71,11 +71,11 @@ const lookbookItems = [
 ]
 
 const brandPartners = [
-  { name: "Zara", logo: "/placeholder.svg?height=60&width=120" },
-  { name: "H&M", logo: "/placeholder.svg?height=60&width=120" },
-  { name: "Uniqlo", logo: "/placeholder.svg?height=60&width=120" },
-  { name: "COS", logo: "/placeholder.svg?height=60&width=120" },
-  { name: "Arket", logo: "/placeholder.svg?height=60&width=120" },
+  { name: "Nike", logo: "/nike.png" },
+  { name: "H&M", logo: "/HMkids.webp" },
+  { name: "adidas", logo: "/adidas.png" },
+  { name: "Puma", logo: "/puma.jpg" },
+  { name: "Reebok", logo: "/rebook.png" },
 ]
 
 export default function HomePage() {
@@ -142,7 +142,7 @@ export default function HomePage() {
           >
             <div className="relative h-full">
               <Image
-                src="/images/crosby-hinze-qzst3cCbn6E-unsplash.jpg"
+                src="/images/women-banner.jpg"
                 alt={slide.title}
                 fill
                 className="object-cover"
@@ -204,27 +204,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Brand Partners */}
-      <section className="py-12 border-b">
-        <div className="container">
-          <div className="flex items-center justify-center space-x-12 opacity-60">
-            {brandPartners.map((brand) => (
-              <div key={brand.name} className="grayscale hover:grayscale-0 transition-all">
-                <Image
-                  src={brand.logo || "/placeholder.svg"}
-                  alt={brand.name}
-                  width={120}
-                  height={60}
-                  className="object-contain"
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+  
 
       {/* Categories Showcase */}
-      <section className="py-20">
+      <section className="py-20 categories-section">
         <div className="container">
           <div className="text-center mb-16">
             <h2 className="text-5xl font-light mb-6 tracking-tight">Discover Your Style</h2>
@@ -239,7 +222,7 @@ export default function HomePage() {
               className="group relative overflow-hidden rounded-2xl aspect-[3/4] block"
             >
               <Image
-                src="/placeholder.svg?height=600&width=450"
+                src="/images/women.jpg"
                 alt="Women's Fashion"
                 fill
                 className="object-cover transition-transform duration-700 group-hover:scale-110"
@@ -248,7 +231,7 @@ export default function HomePage() {
               <div className="absolute bottom-8 left-8 text-white">
                 <h3 className="text-3xl font-light mb-3">Women's</h3>
                 <p className="text-white/80 mb-4">Elegant & Contemporary</p>
-                <Button variant="outline" className="border-white text-white hover:bg-white hover:text-black">
+                <Button variant="outline" className="border-black bg-black text-white hover:bg-white hover:text-black coltnbtn">
                   Explore Collection
                 </Button>
               </div>
@@ -259,7 +242,7 @@ export default function HomePage() {
               className="group relative overflow-hidden rounded-2xl aspect-[3/4] block"
             >
               <Image
-                src="/placeholder.svg?height=600&width=450"
+                src="/images/men.jpg"
                 alt="Men's Fashion"
                 fill
                 className="object-cover transition-transform duration-700 group-hover:scale-110"
@@ -268,7 +251,7 @@ export default function HomePage() {
               <div className="absolute bottom-8 left-8 text-white">
                 <h3 className="text-3xl font-light mb-3">Men's</h3>
                 <p className="text-white/80 mb-4">Refined & Modern</p>
-                <Button variant="outline" className="border-white text-white hover:bg-white hover:text-black">
+                <Button variant="outline" className="border-black bg-black text-white hover:bg-white hover:text-black coltnbtn">
                   Explore Collection
                 </Button>
               </div>
@@ -279,7 +262,7 @@ export default function HomePage() {
               className="group relative overflow-hidden rounded-2xl aspect-[3/4] block"
             >
               <Image
-                src="/placeholder.svg?height=600&width=450"
+                src="/images/accessories.jpg"
                 alt="Accessories"
                 fill
                 className="object-cover transition-transform duration-700 group-hover:scale-110"
@@ -288,7 +271,7 @@ export default function HomePage() {
               <div className="absolute bottom-8 left-8 text-white">
                 <h3 className="text-3xl font-light mb-3">Accessories</h3>
                 <p className="text-white/80 mb-4">Statement Pieces</p>
-                <Button variant="outline" className="border-white text-white hover:bg-white hover:text-black">
+                <Button variant="outline" className="border-black bg-black text-white hover:bg-white hover:text-black coltnbtn">
                   Explore Collection
                 </Button>
               </div>
@@ -360,6 +343,27 @@ export default function HomePage() {
         </div>
       </section>
 
+
+
+          {/* Brand Partners */}
+      <section className="py-12 border-b">
+        <div className="container">
+          <div className="flex items-center justify-center space-x-12">
+            {brandPartners.map((brand) => (
+              <div key={brand.name} className="transition-all">
+                <Image
+                  src={brand.logo || "/placeholder.svg"}
+                  alt={brand.name}
+                  width={120}
+                  height={60}
+                  className="object-contain"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Lookbook Section */}
       <section className="py-20">
         <div className="container">
@@ -379,20 +383,20 @@ export default function HomePage() {
                     className="object-cover transition-transform duration-700 group-hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
-                  <Button size="sm" className="absolute bottom-6 left-6 bg-white text-black hover:bg-white/90">
+                  {/* <Button size="sm" className="absolute bottom-6 left-6 bg-white text-black hover:bg-white/90">
                     <Play className="h-4 w-4 mr-2" />
                     Shop the Look
-                  </Button>
+                  </Button> */}
                 </div>
                 <h3 className="text-2xl font-light mb-2">{item.title}</h3>
                 <p className="text-muted-foreground mb-3">{item.description}</p>
-                <div className="flex flex-wrap gap-2">
+                {/* <div className="flex flex-wrap gap-2">
                   {item.products.map((product) => (
                     <Badge key={product} variant="outline">
                       {product}
                     </Badge>
                   ))}
-                </div>
+                </div> */}
               </div>
             ))}
           </div>

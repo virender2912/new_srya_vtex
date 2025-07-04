@@ -14,6 +14,8 @@ import { LiveSearch } from "@/components/live-search"
 import LanguageToggle from "./language-toggle" 
 import { useTranslation } from "@/hooks/use-translation"
 import { useLanguage } from "@/contexts/language-context"
+import Image from "next/image"
+
 
 
 
@@ -99,27 +101,44 @@ export function Layout({ children }: LayoutProps) {
           </Sheet>
 
           {/* Logo */}
-          <Link href="/" className="mr-8 flex items-center space-x-2">
+          {/* <Link href="/" className="mr-8 flex items-center space-x-2">
             <span className="text-3xl font-light tracking-wider">FASHION</span>
-          </Link>
+          </Link> */}
+
+          <Link href="/" className="mr-8 flex items-center space-x-2">
+  <Image
+    src="/Logo Final (1).png" // 🔁 Your logo path (put the image in public folder)
+    alt="Fashion Logo"
+    width={120} // 🔁 Adjust size as needed
+    height={40}
+    priority
+  />
+</Link>
 
           {/* Desktop navigation */}
           <nav className="hidden md:flex items-center space-x-8 text-sm font-medium tracking-wide">
-            <Link href="/category/nike" className="transition-colors hover:text-primary uppercase">
-             {t("Nike")}
+            <Link href="/category/men" className="transition-colors hover:text-primary uppercase">
+             Men
             </Link>
-            <Link href="/category/mens" className="transition-colors hover:text-primary uppercase">
-            {t("mens")}
+            <Link href="/category/women" className="transition-colors hover:text-primary uppercase">
+            Women
             </Link> 
-            <Link href="/category/scarf" className="transition-colors hover:text-primary uppercase">
-            {t("accessories")}
+            <Link href="/category/kids" className="transition-colors hover:text-primary uppercase">
+            Kids
             </Link>
-            <Link href="/category/nike" className="transition-colors hover:text-primary uppercase">
-            {t("shoes")}
+            <Link href="/category/baby" className="transition-colors hover:text-primary uppercase">
+            Baby
             </Link>
-            <Link href="/category/sale" className="transition-colors hover:text-red-600 uppercase text-red-600">
-            {t("sale")}
+            {/* <Link href="/category/sports" className="transition-colors hover:text-red-600 uppercase text-red-600">
+            Sports
+            </Link> */}
+
+
+
+<Link href="/category/sports" className="transition-colors uppercase">
+            Sports
             </Link>
+
           </nav>
 
           <div className="flex flex-1 items-center justify-end space-x-4">

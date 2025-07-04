@@ -41,40 +41,50 @@ export default function CategoryPage() {
   const [selectedBrands, setSelectedBrands] = useState<string[]>([])
   const [availableBrands, setAvailableBrands] = useState<string[]>([])
 
-  useEffect(() => {
-    const loadCategoryData = async () => {
-      setLoading(true)
-      try {
-        // Load category info
-        const categoryResponse = await fetch("/api/categories")
-        if (categoryResponse.ok) {
-          const categories = await categoryResponse.json()
-          const currentCategory = categories.find((cat: CategoryData) => cat.slug === slug)
-          setCategory(currentCategory || null)
-        }
+useEffect(() => {
+  const loadCategoryData = async () => {
+    setLoading(true)
+    try {
+      // Fetch all categories
+      const categoryResponse = await fetch("/api/categories")
+      if (!categoryResponse.ok) throw new Error("Failed to fetch categories")
 
-        // Load products for this category
-        const productsResponse = await fetch(`/api/products?category=${slug}`)
-        if (productsResponse.ok) {
-          const result = await productsResponse.json()
-          setProducts(result.products)
-          setFilteredProducts(result.products)
-console.log("test", result);
-          // Extract unique brands
-          const brands = [...new Set(result.products.map((p: VtexProduct) => p.brand))] as string[];
-          setAvailableBrands(brands)
-        }
-      } catch (error) {
-        console.error("Failed to load category data:", error)
-      } finally {
-        setLoading(false)
+      const categories: CategoryData[] = await categoryResponse.json()
+      const matchedCategory = categories.find((cat) => cat.slug === slug)
+
+      if (!matchedCategory) {
+        setCategory(null)
+        setProducts([])
+        setFilteredProducts([])
+        return
       }
-    }
 
-    if (slug) {
-      loadCategoryData()
+      setCategory(matchedCategory)
+
+      // Now fetch products using category ID
+      const productsResponse = await fetch(`/api/products?category=${matchedCategory.id}`)
+      if (!productsResponse.ok) throw new Error("Failed to fetch products")
+
+      const result = await productsResponse.json()
+      setProducts(result.products)
+      setFilteredProducts(result.products)
+
+      // Extract brands
+      const brands = [...new Set(result.products.map((p: VtexProduct) => p.brand))] as string[]
+      setAvailableBrands(brands)
+
+    } catch (error) {
+      console.error("Error loading category/products:", error)
+    } finally {
+      setLoading(false)
     }
-  }, [slug])
+  }
+
+  if (slug) {
+    loadCategoryData()
+  }
+}, [slug])
+
 
   // Filter products based on search, price, and brands
   useEffect(() => {

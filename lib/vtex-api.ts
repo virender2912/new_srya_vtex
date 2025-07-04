@@ -167,36 +167,89 @@ export interface VtexSearchResult {
 }
 
 // API functions
-export async function searchProducts(query: string, page = 1, pageSize = 12): Promise<VtexSearchResult> {
-  // Check if VTEX configuration is available
-  if (!VTEX_ACCOUNT || VTEX_ACCOUNT === "your-account") {
-    throw new Error("VTEX configuration not found. Please set up your environment variables.")
+// export async function searchProducts(query: string, page = 1, pageSize = 12): Promise<VtexSearchResult> {
+//   // Check if VTEX configuration is available
+//   if (!VTEX_ACCOUNT || VTEX_ACCOUNT === "your-account") {
+//     throw new Error("VTEX configuration not found. Please set up your environment variables.")
+//   }
+
+
+
+//   const from = (page - 1) * pageSize
+//   const to = from + pageSize - 1
+  
+//   // Clean and validate the query
+//   const cleanQuery = query.trim()
+  
+//   console.log('Searching with query:', cleanQuery)
+   
+//   const response = await fetch(
+//     `${BASE_URL}/api/catalog_system/pub/products/search?ft=${encodeURIComponent(cleanQuery)}`,
+//     {
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//     },
+//   )
+
+//   if (!response.ok) {
+//     throw new Error(`Failed to search products: ${response.status} ${response.statusText}`)
+//   }
+
+//   const products = await response.json()
+
+//   return {
+//     products,
+//     recordsFiltered: products.length,
+//     correction: { misspelled: false },
+//     fuzzy: "",
+//     operator: "and",
+//     translated: false,
+//     pagination: {
+//       count: Math.ceil(products.length / pageSize),
+//       current: { index: page, proxyUrl: "" },
+//       before: [],
+//       after: [],
+//       perPage: pageSize,
+//       next: { index: page + 1, proxyUrl: "" },
+//       previous: { index: page - 1, proxyUrl: "" },
+//       first: { index: 1, proxyUrl: "" },
+//       last: { index: Math.ceil(products.length / pageSize), proxyUrl: "" },
+//     },
+//   }
+// }
+export async function searchProducts(
+  query: string,
+  page = 1,
+  pageSize = 12,
+  category = ""
+): Promise<VtexSearchResult> {
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
+  const cleanQuery = query.trim();
+
+  let url = `${BASE_URL}/api/catalog_system/pub/products/search?_from=${from}&_to=${to}`;
+
+  if (category) {
+    url += `&fq=C:/${category}/`;
   }
 
+  if (cleanQuery) {
+    url += `&ft=${encodeURIComponent(cleanQuery)}`;
+  }
 
-
-  const from = (page - 1) * pageSize
-  const to = from + pageSize - 1
-  
-  // Clean and validate the query
-  const cleanQuery = query.trim()
-  
-  console.log('Searching with query:', cleanQuery)
-   
-  const response = await fetch(
-    `${BASE_URL}/api/catalog_system/pub/products/search?ft=${encodeURIComponent(cleanQuery)}`,
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
+  const response = await fetch(url, {
+    headers: { 
+      "Content-Type": "application/json",
     },
-  )
+  });
 
   if (!response.ok) {
-    throw new Error(`Failed to search products: ${response.status} ${response.statusText}`)
+    throw new Error(`Failed to search products: ${response.status} ${response.statusText}`);
   }
 
-  const products = await response.json()
+  const products = await response.json();
 
   return {
     products,
@@ -216,8 +269,18 @@ export async function searchProducts(query: string, page = 1, pageSize = 12): Pr
       first: { index: 1, proxyUrl: "" },
       last: { index: Math.ceil(products.length / pageSize), proxyUrl: "" },
     },
-  }
+  };
 }
+
+
+
+
+
+
+
+
+
+
 
 export async function getProductById(productId: string): Promise<VtexProduct> {
   const response = await fetch(`${BASE_URL}/api/catalog_system/pub/products/search?fq=productId:${productId}`, {
@@ -279,25 +342,56 @@ export async function getCategories() {
   return response.json()
 }
 
-export async function getProductsByCategory(categoryId: string, page = 1, pageSize = 12) {
+// export async function getProductsByCategory(categoryId: string, page = 1, pageSize = 50) {
+//   const from = (page - 1) * pageSize
+//   const to = from + pageSize - 1
+
+//   const response = await fetch(
+//     `${BASE_URL}/api/catalog_system/pub/products/search?fq=C:/${categoryId}/&_from=${from}&_to=${to}`,
+//     {
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//     },
+//   )
+
+//   if (!response.ok) {
+//     throw new Error("Failed to get products by category")
+//   }
+
+//   return response.json()
+// }
+
+
+
+export async function getProductsByCategory(categoryId: string, page = 1, pageSize = 50) {
   const from = (page - 1) * pageSize
   const to = from + pageSize - 1
 
   const response = await fetch(
-    `${BASE_URL}/api/catalog_system/pub/products/search?fq=C:/${categoryId}/&_from=${from}&_to=${to}`,
+        `${BASE_URL}/api/catalog_system/pub/products/search?fq=C:/${categoryId}/&_from=${from}&_to=${to}`,
+
     {
       headers: {
         "Content-Type": "application/json",
       },
-    },
+    }
   )
 
   if (!response.ok) {
     throw new Error("Failed to get products by category")
   }
 
-  return response.json()
+  const products = await response.json()
+
+  // sort by latest release date
+  products.sort((a: VtexProduct, b: VtexProduct) => {
+    return new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime()
+  })
+
+  return products
 }
+
 
 // Format price helper - show as $1.20
 export function formatPrice(price: number): string {
