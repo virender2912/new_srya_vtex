@@ -1,8 +1,7 @@
 // VTEX API configuration and utilities
 const VTEX_ACCOUNT = process.env.NEXT_PUBLIC_VTEX_ACCOUNT || "iamtechiepartneruae"
 const VTEX_ENVIRONMENT = process.env.NEXT_PUBLIC_VTEX_ENVIRONMENT || "vtexcommercestable"
-const VTEX_APP_KEY = "vtexappkey-iamtechiepartneruae-WJLMGP"
-const VTEX_APP_TOKEN = "BOYZYIBHLFAANVTZIUKBYFTJJNWYIZGPYPPCQBXZKNCBRDKHBITJCAVKKGQHZXASSXJCTJZRQOCRHIRGTWPPUBSONYGDVFEROCDWJDILRFKLHOBTKRHJGWXYQFGZURDO"
+
 
 const BASE_URL = `https://${VTEX_ACCOUNT}.${VTEX_ENVIRONMENT}.com.br`
 
@@ -10,6 +9,7 @@ const BASE_URL = `https://${VTEX_ACCOUNT}.${VTEX_ENVIRONMENT}.com.br`
 export interface VtexProduct {
   productId: string
   productName: string
+  productName_ar?: string   
   brand: string
   brandId: number
   brandImageUrl: string
@@ -27,11 +27,14 @@ export interface VtexProduct {
   link: string
   description: string
   items: VtexSku[]
+  Arabic_title?: string[]
+  Arabic_description?: string[]
 }
 
 export interface VtexSku {
   itemId: string
   name: string
+   name_ar?: string  
   nameComplete: string
   complementName: string
   ean: string
@@ -166,58 +169,12 @@ export interface VtexSearchResult {
   }
 }
 
-// API functions
-// export async function searchProducts(query: string, page = 1, pageSize = 12): Promise<VtexSearchResult> {
-//   // Check if VTEX configuration is available
-//   if (!VTEX_ACCOUNT || VTEX_ACCOUNT === "your-account") {
-//     throw new Error("VTEX configuration not found. Please set up your environment variables.")
-//   }
+export async function fetchCategories(level: number = 3) {
+  const response = await fetch(`/api/categories?level=${level}`);
+  if (!response.ok) throw new Error("Failed to fetch categories");
+  return await response.json();
+}
 
-
-
-//   const from = (page - 1) * pageSize
-//   const to = from + pageSize - 1
-  
-//   // Clean and validate the query
-//   const cleanQuery = query.trim()
-  
-//   console.log('Searching with query:', cleanQuery)
-   
-//   const response = await fetch(
-//     `${BASE_URL}/api/catalog_system/pub/products/search?ft=${encodeURIComponent(cleanQuery)}`,
-//     {
-//       headers: {
-//         "Content-Type": "application/json",
-//       },
-//     },
-//   )
-
-//   if (!response.ok) {
-//     throw new Error(`Failed to search products: ${response.status} ${response.statusText}`)
-//   }
-
-//   const products = await response.json()
-
-//   return {
-//     products,
-//     recordsFiltered: products.length,
-//     correction: { misspelled: false },
-//     fuzzy: "",
-//     operator: "and",
-//     translated: false,
-//     pagination: {
-//       count: Math.ceil(products.length / pageSize),
-//       current: { index: page, proxyUrl: "" },
-//       before: [],
-//       after: [],
-//       perPage: pageSize,
-//       next: { index: page + 1, proxyUrl: "" },
-//       previous: { index: page - 1, proxyUrl: "" },
-//       first: { index: 1, proxyUrl: "" },
-//       last: { index: Math.ceil(products.length / pageSize), proxyUrl: "" },
-//     },
-//   }
-// }
 export async function searchProducts(
   query: string,
   page = 1,
@@ -240,7 +197,7 @@ export async function searchProducts(
   }
 
   const response = await fetch(url, {
-    headers: { 
+    headers: {
       "Content-Type": "application/json",
     },
   });
@@ -342,35 +299,16 @@ export async function getCategories() {
   return response.json()
 }
 
-// export async function getProductsByCategory(categoryId: string, page = 1, pageSize = 50) {
-//   const from = (page - 1) * pageSize
-//   const to = from + pageSize - 1
 
-//   const response = await fetch(
-//     `${BASE_URL}/api/catalog_system/pub/products/search?fq=C:/${categoryId}/&_from=${from}&_to=${to}`,
-//     {
-//       headers: {
-//         "Content-Type": "application/json",
-//       },
-//     },
-//   )
-
-//   if (!response.ok) {
-//     throw new Error("Failed to get products by category")
-//   }
-
-//   return response.json()
-// }
 
 
 
 export async function getProductsByCategory(categoryId: string, page = 1, pageSize = 50) {
   const from = (page - 1) * pageSize
-  const to = from + pageSize - 1
+  const to = 50
 
   const response = await fetch(
-        `${BASE_URL}/api/catalog_system/pub/products/search?fq=C:/${categoryId}/&_from=${from}&_to=${to}`,
-
+    `${BASE_URL}/api/catalog_system/pub/products/search?fq=C:/${categoryId}/&_from=${from}&_to=${to}`,
     {
       headers: {
         "Content-Type": "application/json",
@@ -394,11 +332,11 @@ export async function getProductsByCategory(categoryId: string, page = 1, pageSi
 
 
 // Format price helper - show as $1.20
-export function formatPrice(price: number): string {
-  return `$${(price / 100).toLocaleString("en-US", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`
+export function formatPrice(price: number) {
+  return new Intl.NumberFormat("en-AE", {
+    style: "currency",
+    currency: "AED",
+  }).format(price / 100)
 }
 
 // Get best available price from SKU
@@ -412,6 +350,7 @@ export function getListPrice(sku: VtexSku): number {
   const seller = sku.sellers.find((s) => s.sellerDefault) || sku.sellers[0]
   return seller?.commertialOffer?.ListPrice || 0
 }
+
 
 
 // Check if product is available

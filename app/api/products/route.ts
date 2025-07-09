@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
     const query = searchParams.get("q") || ""
    
     const page = Number.parseInt(searchParams.get("page") || "1")
-    const pageSize = Number.parseInt(searchParams.get("pageSize") || "12")
+    const pageSize = Number.parseInt(searchParams.get("pageSize") || "50")
 
     // Add category filtering logic
     const category = searchParams.get("category") || ""

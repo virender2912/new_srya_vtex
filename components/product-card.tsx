@@ -1,35 +1,50 @@
 "use client"
 
 import type React from "react"
-
 import Image from "next/image"
 import Link from "next/link"
 import { ShoppingCart, Heart, Eye } from "lucide-react"
-
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useCart } from "@/contexts/cart-context"
 import { useWishlist } from "@/contexts/wishlist-context"
-import { type VtexProduct, formatPrice, getBestPrice, getListPrice, isProductAvailable } from "@/lib/vtex-api"
+import {
+  type VtexProduct,
+  formatPrice,
+  getBestPrice,
+  getListPrice,
+  isProductAvailable,
+} from "@/lib/vtex-api"
+import { useTranslation } from "@/hooks/use-translation"
 
 interface ProductCardProps {
-  product: VtexProduct
+  product: VtexProduct & {
+    Arabic_title?: string[]
+    Arabic_description?: string[]
+  }
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+  const { language } = useTranslation() // ✅ Correct usage, not `locale`
   const { addItem } = useCart()
   const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist } = useWishlist()
+
   const firstSku = product.items[0]
   const bestPrice = getBestPrice(firstSku)
   const listPrice = getListPrice(firstSku)
   const isAvailable = isProductAvailable(firstSku)
   const hasDiscount = listPrice > bestPrice
-  const discountPercentage = hasDiscount ? Math.round(((listPrice - bestPrice) / listPrice) * 100) : 0
+  const discountPercentage = hasDiscount
+    ? Math.round(((listPrice - bestPrice) / listPrice) * 100)
+    : 0
   const inWishlist = isInWishlist(product.productId)
-    const cleanLinkText = product.linkText?.replace(/^-+/, '') || ''
-
+  const cleanLinkText = product.linkText?.replace(/^-+/, "") || ""
   const imageUrl = firstSku?.images[0]?.imageUrl || "/placeholder.svg?height=400&width=300"
+
+  // ✅ Arabic title fallback logic
+  const arabicTitle = Array.isArray(product.Arabic_title) ? product.Arabic_title[0] : null
+  const title = language === "ar" && arabicTitle ? arabicTitle : product.productName
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -54,8 +69,8 @@ export function ProductCard({ product }: ProductCardProps) {
       <div className="relative aspect-[3/4] overflow-hidden rounded-2xl">
         <Link href={`/product/${cleanLinkText}`}>
           <Image
-            src={imageUrl || "/placeholder.svg"}
-            alt={product.productName}
+            src={imageUrl}
+            alt={title}
             fill
             className="object-cover transition-transform duration-700 group-hover:scale-110"
           />
@@ -81,7 +96,9 @@ export function ProductCard({ product }: ProductCardProps) {
             variant="secondary"
             size="icon"
             className={`rounded-full shadow-lg backdrop-blur-sm ${
-              inWishlist ? "bg-red-500 text-white hover:bg-red-600" : "bg-white/90 text-gray-700 hover:bg-white"
+              inWishlist
+                ? "bg-red-500 text-white hover:bg-red-600"
+                : "bg-white/90 text-gray-700 hover:bg-white"
             }`}
             onClick={handleWishlistToggle}
           >
@@ -108,7 +125,11 @@ export function ProductCard({ product }: ProductCardProps) {
             onClick={handleAddToCart}
           >
             <ShoppingCart className="h-4 w-4 mr-2" />
-            {isAvailable ? "Quick Add" : "Sold Out"}
+
+         {language === 'ar'
+  ? (isAvailable ? "أضف إلى السلة" : "نفذ")
+  : (isAvailable ? "Add to Cart" : "Sold Out")}
+
           </Button>
         </div>
       </div>
@@ -116,10 +137,12 @@ export function ProductCard({ product }: ProductCardProps) {
       <CardContent className="p-6">
         <div className="space-y-3">
           <div>
-            <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium mb-1">{product.brand}</p>
+            <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium mb-1">
+              {product.brand}
+            </p>
             <Link href={`/product/${cleanLinkText}`}>
               <h3 className="font-medium text-lg line-clamp-2 hover:text-primary transition-colors leading-tight">
-                {product.productName}
+                {title}
               </h3>
             </Link>
           </div>
@@ -128,7 +151,9 @@ export function ProductCard({ product }: ProductCardProps) {
             <div className="flex items-baseline space-x-2">
               <span className="text-xl font-semibold">{formatPrice(bestPrice)}</span>
               {hasDiscount && (
-                <span className="text-sm text-muted-foreground line-through">{formatPrice(listPrice)}</span>
+                <span className="text-sm text-muted-foreground line-through">
+                  {formatPrice(listPrice)}
+                </span>
               )}
             </div>
           </div>

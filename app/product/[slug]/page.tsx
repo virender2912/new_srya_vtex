@@ -15,6 +15,13 @@ import { Layout } from "@/components/layout"
 import { type VtexProduct, formatPrice, getBestPrice, getListPrice, isProductAvailable } from "@/lib/vtex-api"
 import { useCart } from "@/contexts/cart-context"
 import { useWishlist } from "@/contexts/wishlist-context"
+import { useTranslation } from "@/hooks/use-translation"
+
+
+  type LocalizedProduct = VtexProduct & {
+  Arabic_title?: string[]
+  Arabic_description?: string[]
+}
 
 export default function ProductPage() {
   const params = useParams()
@@ -25,9 +32,11 @@ export default function ProductPage() {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
   const [selectedSku, setSelectedSku] = useState(0)
   const [quantity, setQuantity] = useState(1)
-
+console.log("Add to Cart ➜", product)
   const { addItem } = useCart()
   const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist } = useWishlist()
+  const { t, language } = useTranslation()
+  const isArabic = language === "ar"
 
   useEffect(() => {
     const loadProduct = async () => {
@@ -111,6 +120,12 @@ export default function ProductPage() {
     )
   }
 
+  const title = isArabic && product.Arabic_title?.[0] ? product.Arabic_title[0] : product.productName
+  const description =
+    isArabic && product.Arabic_description?.[0]
+      ? product.Arabic_description[0]
+      : product.description || t("default_product_description")
+
   const currentSku = product.items[selectedSku]
   const bestPrice = getBestPrice(currentSku)
   const listPrice = getListPrice(currentSku)
@@ -118,7 +133,7 @@ export default function ProductPage() {
   const hasDiscount = listPrice > bestPrice
   const discountPercentage = hasDiscount ? Math.round(((listPrice - bestPrice) / listPrice) * 100) : 0
   const inWishlist = isInWishlist(product.productId)
-
+//const { t } = useTranslation()
   const images = currentSku?.images || []
   const currentImage = images[selectedImageIndex]
 
@@ -193,7 +208,7 @@ export default function ProductPage() {
               <div className="flex items-start justify-between mb-4">
                 <div>
                   <p className="text-sm text-muted-foreground uppercase tracking-wide mb-2">{product.brand}</p>
-                  <h1 className="text-4xl font-light mb-4 leading-tight">{product.productName}</h1>
+                  <h1 className="text-4xl font-light mb-4 leading-tight">{title}</h1>
                 </div>
                 <Button
                   variant="ghost"
@@ -233,10 +248,10 @@ export default function ProductPage() {
             <div className="space-y-6">
               {product.items.length > 1 && (
                 <div>
-                  <Label className="text-base font-medium mb-3 block">Variations</Label>
+                  <Label className="text-base font-medium mb-3 block">{t("variations")}</Label>
                   <div className="flex flex-wrap gap-2">
                     {product.items.map((sku, index) => (
-                      <Button
+                      <Button className="variantbtns"
                         key={sku.itemId}
                         variant={selectedSku === index ? "default" : "outline"}
                         size="sm"
@@ -251,9 +266,9 @@ export default function ProductPage() {
 
               {/* Quantity */}
               <div>
-                <Label className="text-base font-medium mb-3 block">Quantity</Label>
+                <Label className="text-base font-medium mb-3 block">{t("quantity")}</Label>
                 <div className="flex items-center gap-3">
-                  <Button
+                  <Button className="qntybtn"
                     variant="outline"
                     size="icon"
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
@@ -262,7 +277,7 @@ export default function ProductPage() {
                     <Minus className="h-4 w-4" />
                   </Button>
                   <span className="w-12 text-center font-medium">{quantity}</span>
-                  <Button
+                  <Button className="qntybtn"
                     variant="outline"
                     size="icon"
                     onClick={() => setQuantity(Math.min(availableQuantity, quantity + 1))}
@@ -271,7 +286,7 @@ export default function ProductPage() {
                     <Plus className="h-4 w-4" />
                   </Button>
                 </div>
-                <p className="text-sm text-muted-foreground mt-1">{availableQuantity} items available</p>
+                {/* <p className="text-sm text-muted-foreground mt-1">{availableQuantity} items available</p> */}
               </div>
             </div>
 
@@ -279,12 +294,12 @@ export default function ProductPage() {
             <div className="space-y-4">
               <Button size="lg" className="w-full h-14 text-lg" disabled={!isAvailable} onClick={handleAddToCart}>
                 <ShoppingCart className="h-5 w-5 mr-3" />
-                {isAvailable ? `Add to Cart - ${formatPrice(bestPrice * quantity)}` : "Out of Stock"}
+                {isAvailable ? `${t("addToCart")} - ${formatPrice(bestPrice * quantity)}` : "Out of Stock"}
               </Button>
 
               <Button variant="outline" size="lg" className="w-full h-12">
                 <Share2 className="h-5 w-5 mr-2" />
-                Share
+                {t("share")}
               </Button>
             </div>
 
@@ -323,16 +338,16 @@ export default function ProductPage() {
         <Tabs defaultValue="description" className="w-full">
           <TabsList className="grid w-full grid-cols-4 mb-8">
             <TabsTrigger value="description" className="text-lg">
-              Description
+              {t("description")}
             </TabsTrigger>
             <TabsTrigger value="specifications" className="text-lg">
-              Details
+              {t("details")}
             </TabsTrigger>
             <TabsTrigger value="care" className="text-lg">
-              Care Guide
+              {t("care_guide")}
             </TabsTrigger>
             <TabsTrigger value="reviews" className="text-lg">
-              Reviews
+              {t("reviews")}
             </TabsTrigger>
           </TabsList>
 
@@ -340,13 +355,9 @@ export default function ProductPage() {
             <Card>
               <CardContent className="p-8">
                 <div
-                  className="prose max-w-none text-lg leading-relaxed"
-                  dangerouslySetInnerHTML={{
-                    __html:
-                      product.description ||
-                      "This is a premium fashion piece crafted with attention to detail and quality materials. Perfect for both casual and formal occasions.",
-                  }}
-                />
+                  className="prose max-w-none text-lg leading-relaxed">
+                    {description}
+                  </div>
               </CardContent>
             </Card>
           </TabsContent>
@@ -356,28 +367,28 @@ export default function ProductPage() {
               <CardContent className="p-8">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div>
-                    <h3 className="font-semibold mb-4">Product Details</h3>
+                    <h3 className="font-semibold mb-4">{t("product_details")}</h3>
                     <div className="space-y-3">
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Brand</span>
+                        <span className="text-muted-foreground">{t("brand")}</span>
                         <span className="font-medium">{product.brand}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Product ID</span>
+                        <span className="text-muted-foreground">{t("product_id")}</span>
                         <span className="font-medium">{product.productId}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Material</span>
-                        <span className="font-medium">Premium Cotton Blend</span>
+                        <span className="text-muted-foreground">{t("material")}</span>
+                        <span className="font-medium">{t("premium_cotton_blend")}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-muted-foreground">Origin</span>
-                        <span className="font-medium">Made in Brazil</span>
+                        <span className="text-muted-foreground">{t("origin")}</span>
+                        <span className="font-medium">{t("made_in_brazil")}</span>
                       </div>
                     </div>
                   </div>
                   <div>
-                    <h3 className="font-semibold mb-4">Categories</h3>
+                    <h3 className="font-semibold mb-4">{t("categories")}</h3>
                     <div className="flex flex-wrap gap-2">
                       {product.categories.map((category) => (
                         <Badge key={category} variant="outline">
@@ -396,21 +407,21 @@ export default function ProductPage() {
               <CardContent className="p-8">
                 <div className="space-y-6">
                   <div>
-                    <h3 className="font-semibold mb-3">Care Instructions</h3>
+                    <h3 className="font-semibold mb-3">{t("care_instructions")}</h3>
                     <ul className="space-y-2 text-muted-foreground">
-                      <li>• Machine wash cold with like colors</li>
-                      <li>• Do not bleach</li>
-                      <li>• Tumble dry low heat</li>
-                      <li>• Iron on low temperature if needed</li>
-                      <li>• Do not dry clean</li>
+                      <li>• {t("care_instruction_1")}</li>
+                      <li>• {t("care_instruction_2")}</li>
+                      <li>• {t("care_instruction_3")}</li>
+                      <li>• {t("care_instruction_4")}</li>
+                      <li>• {t("care_instruction_5")}</li>
                     </ul>
                   </div>
                   <div>
-                    <h3 className="font-semibold mb-3">Storage Tips</h3>
+                    <h3 className="font-semibold mb-3">{t("storage_tips")}</h3>
                     <ul className="space-y-2 text-muted-foreground">
-                      <li>• Hang or fold neatly to prevent wrinkles</li>
-                      <li>• Store in a cool, dry place</li>
-                      <li>• Avoid direct sunlight for extended periods</li>
+                      <li>• {t("storage_tips_1")}</li>
+                      <li>• {t("storage_tips_2")}</li>
+                      <li>• {t("storage_tips_3")}</li>
                     </ul>
                   </div>
                 </div>

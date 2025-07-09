@@ -46,7 +46,7 @@ useEffect(() => {
     setLoading(true)
     try {
       // Fetch all categories
-      const categoryResponse = await fetch("/api/categories")
+      const categoryResponse = await fetch("/api/categories?level=3")
       if (!categoryResponse.ok) throw new Error("Failed to fetch categories")
 
       const categories: CategoryData[] = await categoryResponse.json()
@@ -62,7 +62,7 @@ useEffect(() => {
       setCategory(matchedCategory)
 
       // Now fetch products using category ID
-      const productsResponse = await fetch(`/api/products?category=${matchedCategory.id}`)
+      const productsResponse = await fetch(`/api/products?category=${matchedCategory.id}&count=1000`)
       if (!productsResponse.ok) throw new Error("Failed to fetch products")
 
       const result = await productsResponse.json()

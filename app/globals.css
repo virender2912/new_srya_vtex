@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  /* font-family: Arial, Helvetica, sans-serif; */
 }
 
 @layer utilities {
@@ -111,7 +111,9 @@ body {
 
 /* globals.css */
 
-
+body{
+  background:#FFFFF0;
+}
 
 @font-face {
   font-family: 'Playfair Display';
@@ -135,4 +137,74 @@ body, p, li, a, span, button {
 
 h1, h2, h3, h3, h4, h5, h6 {
   font-family: 'Playfair Display', serif;
+}
+
+
+
+h2.text-5xl.font-light.mb-6.tracking-tight{
+  font-size: 16px;
+    text-transform: uppercase;
+}
+
+.ivorywhite-bg {
+  background:#FFFFF0;
+}
+
+.variantbtns:hover {
+    background: #FFFFF0;
+}
+
+.qntybtn:hover {
+    background: #FFFFF0;
+}
+
+.addtocartbtn:hover {
+    background: #fffff0;
+    color: #000;
+    border: 1px solid #000;
+}
+
+.ftrnewslter {
+    display: inline-block;
+}
+
+.ftrnewslter button {
+    margin-top: 6px;
+}
+.ftrnewslter input {
+    padding-top: .5rem;
+    padding-bottom: .5rem;
+}
+
+
+.subcollections {
+    margin-top: 0;
+}
+
+.ftrshopmenu {
+    padding-left: 70px;
+}
+
+.flex.justify-end.mb-4.gridstyle {
+    justify-content: start;
+}
+
+
+html[dir="rtl"] {
+  font-family: "Tajawal", sans-serif;
+  direction: rtl;
+  text-align: right;
+}
+
+html[dir="ltr"] {
+  direction: ltr;
+  text-align: left;
+}
+
+html[dir="rtl"] .sliderbtn svg {
+    transform: rotate(180deg);
+}
+html[dir="rtl"] header .group.relative {
+    margin-right: 15px;
+    margin-left: 5px;
 }

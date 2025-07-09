@@ -11,61 +11,63 @@ import { Badge } from "@/components/ui/badge"
 import { Layout } from "@/components/layout"
 import { ProductCard } from "@/components/product-card"
 import type { VtexProduct } from "@/lib/vtex-api"
+  import { useTranslation } from "@/hooks/use-translation"
 
 
 const heroSlides = [
   {
     id: 1,
-    title: "Autumn Collection 2024",
-    subtitle: "Embrace the Season",
-    description: "Discover cozy knits, elegant coats, and timeless pieces for the perfect autumn wardrobe",
+    title: "slider_title_1",
+    subtitle: "slider_subtitle_1",
+    description: "slider_description_1",
+    cta: "slider_cta_1",
     image: "/placeholder.svg?height=800&width=1400",
-    cta: "Shop Collection",
-    link: "/category/new-arrivals",
+    link: "/category/men",
     theme: "dark",
   },
   {
     id: 2,
-    title: "Sustainable Luxury",
-    subtitle: "Conscious Fashion",
-    description: "Ethically made, beautifully crafted pieces that respect both style and the planet",
+    title: "slider_title_2",
+    subtitle: "slider_subtitle_2",
+    description: "slider_description_2",
+    cta: "slider_cta_2",
     image: "/placeholder.svg?height=800&width=1400",
-    cta: "Explore Sustainable",
-    link: "/category/womens-fashion",
+    link: "/category/women",
     theme: "light",
   },
   {
     id: 3,
-    title: "Statement Accessories",
-    subtitle: "Complete Your Look",
-    description: "From bold jewelry to designer handbags - elevate every outfit with our curated accessories",
+    title: "slider_title_3",
+    subtitle: "slider_subtitle_3",
+    description: "slider_description_3",
+    cta: "slider_cta_3",
     image: "/placeholder.svg?height=800&width=1400",
-    cta: "Shop Accessories",
-    link: "/category/accessories",
+    link: "/category/kids",
     theme: "dark",
   },
 ]
 
+
 const lookbookItems = [
   {
     id: 1,
-    title: "Office Chic",
-    description: "Professional meets stylish",
-    image: "/placeholder.svg?height=600&width=400",
-    products: ["Blazer", "Trousers", "Heels"],
+    title: "kids_pasion",
+    // description: "Professional meets stylish",
+    image: "/kidsfashion.webp",
+    products: ["Blazer", "Trousers", "Shoes"],
   },
   {
     id: 2,
-    title: "Weekend Casual",
-    description: "Effortless everyday style",
-    image: "/placeholder.svg?height=600&width=400",
+    title: "weekend_casual",
+    // description: "Effortless everyday style",
+    image: "/mensfashion.jfif",
     products: ["Sweater", "Jeans", "Sneakers"],
   },
   {
     id: 3,
-    title: "Evening Elegance",
-    description: "Make a statement",
-    image: "/placeholder.svg?height=600&width=400",
+    title: "evening_elegance",
+    //description: "Make a statement",
+    image: "/womenfashion.webp",
     products: ["Dress", "Jewelry", "Clutch"],
   },
 ]
@@ -84,14 +86,15 @@ export default function HomePage() {
   const [newArrivals, setNewArrivals] = useState<VtexProduct[]>([])
   const [saleProducts, setSaleProducts] = useState<VtexProduct[]>([])
   const [loading, setLoading] = useState(true)
+    const { t } = useTranslation()
 
   useEffect(() => {
     const loadProducts = async () => {
       try {
         const [featuredRes, newArrivalsRes, saleRes] = await Promise.all([
-          fetch("/api/products?pageSize=8"),
-          fetch("/api/products?pageSize=8"),
-          fetch("/api/products?pageSize=8"),
+          fetch("/api/products?pageSize=8&category=28"),
+          fetch("/api/products?pageSize=8&category=20"),
+          fetch("/api/products?pageSize=8&category=36"),
         ])
 
         if (featuredRes.ok) {
@@ -155,21 +158,28 @@ export default function HomePage() {
                     <Badge
                       className={`mb-6 ${slide.theme === "light" ? "bg-black/10 text-black border-black/20" : "bg-white/20 text-white border-white/30"}`}
                     >
-                      {slide.subtitle}
+                      {/* {slide.subtitle} */}
+                      {t(slide.subtitle as any)}
                     </Badge>
-                    <h1 className="text-6xl md:text-8xl font-light mb-8 leading-tight tracking-tight">{slide.title}</h1>
+                    <h1 className="text-6xl md:text-8xl font-light mb-8 leading-tight tracking-tight">
+                     {/* {slide.title} */}
+                      {t(slide.title as any)}
+{/* {t("slider_title_1")} */}
+
+
+                    </h1>
                     <p
                       className={`text-xl mb-10 leading-relaxed ${slide.theme === "light" ? "text-black/80" : "text-white/90"}`}
                     >
-                      {slide.description}
+                 {t(slide.description as any)}
                     </p>
                     <Button
                       size="lg"
-                      className={`${slide.theme === "light" ? "bg-black text-white hover:bg-black/90" : "bg-white text-black hover:bg-white/90"} px-8 py-6 text-lg`}
+                      className={`${slide.theme === "light" ? "bg-black text-white hover:bg-black/90" : "bg-white text-black hover:bg-white/90"} px-8 py-6 text-lg sliderbtn`}
                       asChild
                     >
                       <Link href={slide.link}>
-                        {slide.cta}
+                         {t(slide.cta as any)}
                         <ArrowRight className="ml-3 h-5 w-5" />
                       </Link>
                     </Button>
@@ -210,15 +220,17 @@ export default function HomePage() {
       <section className="py-20 categories-section">
         <div className="container">
           <div className="text-center mb-16">
-            <h2 className="text-5xl font-light mb-6 tracking-tight">Discover Your Style</h2>
+            <h2 className="text-5xl font-light mb-6 tracking-tight">
+              {t("discover_your_style")}
+            </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Curated collections for every moment, every mood, every you
+              {t("curated_collections_for_ever_moment_every_mood_every_you")}
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <Link
-              href="/category/womens-fashion"
+              href="/category/women"
               className="group relative overflow-hidden rounded-2xl aspect-[3/4] block"
             >
               <Image
@@ -229,16 +241,16 @@ export default function HomePage() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
               <div className="absolute bottom-8 left-8 text-white">
-                <h3 className="text-3xl font-light mb-3">Women's</h3>
-                <p className="text-white/80 mb-4">Elegant & Contemporary</p>
+                <h3 className="text-3xl font-light mb-3">{t("womens")}</h3>
+                <p className="text-white/80 mb-4">{t("elegant_contemporary")}</p>
                 <Button variant="outline" className="border-black bg-black text-white hover:bg-white hover:text-black coltnbtn">
-                  Explore Collection
+                  {t("explorecollection")}
                 </Button>
               </div>
             </Link>
 
             <Link
-              href="/category/mens-fashion"
+              href="/category/men"
               className="group relative overflow-hidden rounded-2xl aspect-[3/4] block"
             >
               <Image
@@ -249,30 +261,30 @@ export default function HomePage() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
               <div className="absolute bottom-8 left-8 text-white">
-                <h3 className="text-3xl font-light mb-3">Men's</h3>
-                <p className="text-white/80 mb-4">Refined & Modern</p>
+                <h3 className="text-3xl font-light mb-3">{t("mens")}</h3>
+                <p className="text-white/80 mb-4">{t("refined_modern")}</p>
                 <Button variant="outline" className="border-black bg-black text-white hover:bg-white hover:text-black coltnbtn">
-                  Explore Collection
+                  {t("explorecollection")}
                 </Button>
               </div>
             </Link>
 
             <Link
-              href="/category/accessories"
+              href="/category/kids"
               className="group relative overflow-hidden rounded-2xl aspect-[3/4] block"
             >
               <Image
-                src="/images/accessories.jpg"
+                src="/kidsfashionnew.jpg"
                 alt="Accessories"
                 fill
                 className="object-cover transition-transform duration-700 group-hover:scale-110"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
               <div className="absolute bottom-8 left-8 text-white">
-                <h3 className="text-3xl font-light mb-3">Accessories</h3>
-                <p className="text-white/80 mb-4">Statement Pieces</p>
+                <h3 className="text-3xl font-light mb-3">{t("kids")}</h3>
+                <p className="text-white/80 mb-4">{t("statement_pieces")}</p>
                 <Button variant="outline" className="border-black bg-black text-white hover:bg-white hover:text-black coltnbtn">
-                  Explore Collection
+                  {t("explorecollection")}
                 </Button>
               </div>
             </Link>
@@ -284,20 +296,20 @@ export default function HomePage() {
       <section className="py-20 bg-gray-50">
         <div className="container">
           <div className="text-center mb-16">
-            <h2 className="text-5xl font-light mb-6 tracking-tight">Trending Now</h2>
-            <p className="text-xl text-muted-foreground">Discover what's capturing hearts this season</p>
+            <h2 className="text-5xl font-light mb-6 tracking-tight">{t("trending_now")}</h2>
+            <p className="text-xl text-muted-foreground">{t("discover_whats_capturing_hearts_this_season")}</p>
           </div>
 
           <Tabs defaultValue="featured" className="w-full">
             <TabsList className="grid w-full grid-cols-3 max-w-md mx-auto mb-16 bg-white">
               <TabsTrigger value="featured" className="text-lg">
-                Featured
+                {t("women")}
               </TabsTrigger>
               <TabsTrigger value="new" className="text-lg">
-                New In
+                {t("men")}
               </TabsTrigger>
               <TabsTrigger value="sale" className="text-lg">
-                Sale
+                {t("kids")}
               </TabsTrigger>
             </TabsList>
 
@@ -368,8 +380,8 @@ export default function HomePage() {
       <section className="py-20">
         <div className="container">
           <div className="text-center mb-16">
-            <h2 className="text-5xl font-light mb-6 tracking-tight">Style Inspiration</h2>
-            <p className="text-xl text-muted-foreground">Curated looks for every occasion</p>
+            <h2 className="text-5xl font-light mb-6 tracking-tight">{t("style_inspiration")}</h2>
+            <p className="text-xl text-muted-foreground">{t("curated_looks_for_every_occasion")}</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -388,8 +400,8 @@ export default function HomePage() {
                     Shop the Look
                   </Button> */}
                 </div>
-                <h3 className="text-2xl font-light mb-2">{item.title}</h3>
-                <p className="text-muted-foreground mb-3">{item.description}</p>
+                <h3 className="text-2xl font-light mb-2">{t(item.title as any)}</h3>
+                {/* <p className="text-muted-foreground mb-3">{item.description}</p> */}
                 {/* <div className="flex flex-wrap gap-2">
                   {item.products.map((product) => (
                     <Badge key={product} variant="outline">
@@ -404,13 +416,13 @@ export default function HomePage() {
       </section>
 
       {/* Newsletter */}
-      <section className="py-20 bg-black text-white">
+      {/* <section className="py-20 bg-black text-white">
         <div className="container text-center">
           <h2 className="text-5xl font-light mb-6 tracking-tight">Stay in the Loop</h2>
           <p className="text-xl text-white/80 mb-12 max-w-2xl mx-auto">
             Be the first to know about new arrivals, exclusive offers, and style tips from our fashion experts
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto mb-8">
+          <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto mb-8 ftrnewslter">
             <input
               type="email"
               placeholder="Enter your email"
@@ -432,7 +444,7 @@ export default function HomePage() {
             </Button>
           </div>
         </div>
-      </section>
+      </section> */}
     </Layout>
   )
 }

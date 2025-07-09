@@ -10,10 +10,13 @@ import { Separator } from "@/components/ui/separator"
 import { Layout } from "@/components/layout"
 import { useCart } from "@/contexts/cart-context"
 import { formatPrice } from "@/lib/vtex-api"
-
+  import { useTranslation } from "@/hooks/use-translation"
+  import { useLanguage } from "@/contexts/language-context"
 export default function CartPage() {
   const { state, removeItem, updateQuantity, clearCart } = useCart()
-
+  console.log("Cart items ➜", state.items)
+const { t } = useTranslation()
+const { language } = useLanguage()
   if (state.items.length === 0) {
     return (
       <Layout>
@@ -27,7 +30,7 @@ export default function CartPage() {
             <Button asChild size="lg">
               <Link href="/products">
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Continue Shopping
+                {t("continue_shopping")}
               </Link>
             </Button>
           </div>
@@ -43,12 +46,12 @@ export default function CartPage() {
           <Button variant="ghost" size="sm" asChild>
             <Link href="/products">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Continue Shopping
+              {t("continue_shopping")}
             </Link>
           </Button>
           <div>
-            <h1 className="text-3xl font-bold">Shopping Cart</h1>
-            <p className="text-muted-foreground">{state.totalItems} items in your cart</p>
+            <h1 className="text-3xl font-bold">{t("shopping_cart")}</h1>
+            <p className="text-muted-foreground">{state.totalItems} {t("cart_items")}</p>
           </div>
         </div>
 
@@ -75,7 +78,11 @@ export default function CartPage() {
                             href={`/product/${item.linkText}`}
                             className="block hover:text-primary transition-colors"
                           >
-                            <h3 className="font-semibold text-lg line-clamp-2">{item.productName}</h3>
+                            <h3 className="font-semibold text-lg line-clamp-2">
+  {language === "ar"
+    ? item.productName_ar?.trim() || item.productName
+    : item.productName}
+</h3>
                             {item.skuName !== item.productName && (
                               <p className="text-sm text-muted-foreground mt-1">{item.skuName}</p>
                             )}
@@ -126,7 +133,7 @@ export default function CartPage() {
                             )}
                           </div>
                           <p className="text-sm text-muted-foreground">
-                            Total: {formatPrice(item.price * item.quantity)}
+                            {t("total")}: {formatPrice(item.price * item.quantity)}
                           </p>
                         </div>
                       </div>
@@ -148,43 +155,43 @@ export default function CartPage() {
           <div className="lg:col-span-1">
             <Card className="sticky top-4">
               <CardHeader>
-                <CardTitle>Order Summary</CardTitle>
+                <CardTitle>{t("order_summry")}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span>Subtotal ({state.totalItems} items)</span>
+                    <span>{t("subtotal")} ({state.totalItems} {t("items")})</span>
                     <span>{formatPrice(state.totalPrice)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Shipping</span>
-                    <span className="text-green-600">Free</span>
+                    <span>{t("shipping")}</span>
+                    <span className="text-green-600">{t("free")}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Tax</span>
-                    <span>Calculated at checkout</span>
+                    <span>{t("tax")}</span>
+                    <span>{t("calculate_checkout")}</span>
                   </div>
                 </div>
 
                 <Separator />
 
                 <div className="flex justify-between text-lg font-semibold">
-                  <span>Total</span>
+                  <span>{t("total")}</span>
                   <span>{formatPrice(state.totalPrice)}</span>
                 </div>
 
                 <div className="space-y-2">
                   <Button className="w-full" size="lg">
-                    Proceed to Checkout
+                    {t("proceed_checkout")}
                   </Button>
                   <Button variant="outline" className="w-full" asChild>
-                    <Link href="/products">Continue Shopping</Link>
+                    <Link href="/products">{t("continue_shopping")}</Link>
                   </Button>
                 </div>
 
                 <div className="text-xs text-muted-foreground text-center">
-                  <p>Secure checkout powered by VTEX</p>
-                  <p>Free shipping on orders over $50</p>
+                  <p>{t("secure")}</p>
+                  <p>{t("free_shipping")}</p>
                 </div>
               </CardContent>
             </Card>

@@ -8,17 +8,19 @@ import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { useCart } from "@/contexts/cart-context"
 import { formatPrice } from "@/lib/vtex-api"
-
+  import { useTranslation } from "@/hooks/use-translation"
+  import { useLanguage } from "@/contexts/language-context"
 export function CartDrawer() {
   const { state, closeCart, removeItem, updateQuantity } = useCart()
-
+const { t } = useTranslation()
+ const { language } = useLanguage()
   return (
     <Sheet open={state.isOpen} onOpenChange={closeCart}>
       <SheetContent className="flex flex-col w-full sm:max-w-lg">
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2 text-xl">
             <ShoppingBag className="h-6 w-6" />
-            Shopping Cart ({state.totalItems})
+            {t("shopping_cart")} ({state.totalItems})
           </SheetTitle>
         </SheetHeader>
 
@@ -26,10 +28,10 @@ export function CartDrawer() {
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
               <ShoppingBag className="h-16 w-16 mx-auto text-muted-foreground mb-6" />
-              <h3 className="text-xl font-semibold mb-3">Your cart is empty</h3>
-              <p className="text-muted-foreground mb-6">Add some beautiful pieces to get started!</p>
+              <h3 className="text-xl font-semibold mb-3">{t("cartEmpty")}</h3>
+              <p className="text-muted-foreground mb-6">{t("cartdrawer_text")}</p>
               <Button asChild onClick={closeCart} size="lg">
-                <Link href="/products">Start Shopping</Link>
+                <Link href="/products">{t("start_shopping")}</Link>
               </Button>
             </div>
           </div>
@@ -54,7 +56,11 @@ export function CartDrawer() {
                         onClick={closeCart}
                         className="block hover:text-primary transition-colors"
                       >
-                        <h4 className="font-medium text-sm line-clamp-2 mb-1">{item.productName}</h4>
+                         <h4 className="font-medium text-sm line-clamp-2 mb-1">
+                          {language === "ar"
+                            ? item.productName_ar?.trim() || item.productName
+                            : item.productName}
+                        </h4>
                         <p className="text-xs text-muted-foreground uppercase tracking-wide">{item.brand}</p>
                       </Link>
 
@@ -110,20 +116,20 @@ export function CartDrawer() {
 
             <div className="border-t pt-6 space-y-4">
               <div className="flex items-center justify-between text-xl font-semibold">
-                <span>Total</span>
+                <span>{t("total")}</span>
                 <span>{formatPrice(state.totalPrice)}</span>
               </div>
 
               <div className="space-y-3">
                 <Button className="w-full" size="lg" asChild onClick={closeCart}>
-                  <Link href="/checkout">Secure Checkout</Link>
+                  <Link href="/checkout">{t("securecheckout")}</Link>
                 </Button>
                 <Button variant="outline" className="w-full" asChild onClick={closeCart}>
-                  <Link href="/cart">View Full Cart</Link>
+                  <Link href="/cart">{t("full_cart")}</Link>
                 </Button>
               </div>
 
-              <p className="text-xs text-center text-muted-foreground">Free shipping on orders over $75</p>
+              <p className="text-xs text-center text-muted-foreground">{t("free_shipping")}</p>
             </div>
           </>
         )}

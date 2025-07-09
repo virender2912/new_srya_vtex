@@ -1,9 +1,9 @@
 "use client"
 
-import type React from "react"
-
-import { Search, ShoppingCart, Menu, User, Heart } from "lucide-react"
+import React, { useState, useEffect } from "react"
 import Link from "next/link"
+import Image from "next/image"
+import { Search, ShoppingCart, Menu, User, Heart } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
@@ -11,16 +11,24 @@ import { useCart } from "@/contexts/cart-context"
 import { useWishlist } from "@/contexts/wishlist-context"
 import { useAuth } from "@/contexts/auth-context"
 import { LiveSearch } from "@/components/live-search"
-import LanguageToggle from "./language-toggle" 
+import LanguageToggle from "./language-toggle"
 import { useTranslation } from "@/hooks/use-translation"
 import { useLanguage } from "@/contexts/language-context"
-import Image from "next/image"
-
-
-
 
 interface LayoutProps {
   children: React.ReactNode
+}
+
+interface Category {
+  id: string
+  name: string
+  slug: string
+  children?: {
+    id: string
+    name: string
+    slug: string
+    productCount: number
+  }[]
 }
 
 export function Layout({ children }: LayoutProps) {
@@ -29,133 +37,124 @@ export function Layout({ children }: LayoutProps) {
   const { state: authState, logout } = useAuth()
   const { t } = useTranslation()
   const { isRTL } = useLanguage()
- 
+
+  const [categories, setCategories] = useState<Category[]>([])
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch("/api/categories")
+        const data = await res.json()
+    setCategories(
+  data.filter((cat: Category) =>
+    ["men", "women", "kids", "baby", "sports"].includes(cat.slug.toLowerCase())
+  )
+)
+      } catch (err) {
+        console.error("Failed to load categories", err)
+      }
+    }
+
+    fetchCategories()
+  }, [])
+
   return (
     <div className="min-h-screen bg-background">
-   
       {/* Top Banner */}
       <div className="bg-black text-white text-center py-2 text-sm">
-        <p>Free shipping on orders over $75 | New arrivals weekly</p>
+        <p>
+           {t("announcement_bar")}
+        </p>
       </div>
 
       {/* Header */}
       <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
         <div className="container flex h-20 items-center">
-          {/* Mobile menu */}
-          <Sheet> 
+          {/* Mobile Menu */}
+          <Sheet>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="md:hidden">
                 <Menu className="h-5 w-5" />
-                <span className="sr-only">Toggle menu</span>
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="w-80">
+              {/* Mobile Nav (optional) */}
               <nav className="flex flex-col space-y-6 pt-6">
-                <Link href="/" className="text-2xl font-light">
-                  FASHION
-                </Link>
-                <div className="space-y-4">
-                  <Link href="/category/womens-fashion" className="block text-lg hover:text-primary transition-colors">
-                    Women's
-                  </Link>
-                  <Link href="/category/mens-fashion" className="block text-lg hover:text-primary transition-colors">
-                    Men's
-                  </Link>
-                  <Link href="/category/accessories" className="block text-lg hover:text-primary transition-colors">
-                    Accessories
-                  </Link>
-                  <Link href="/category/shoes" className="block text-lg hover:text-primary transition-colors">
-                    Shoes
-                  </Link>
-                  <Link
-                    href="/category/sale"
-                    className="block text-lg hover:text-primary transition-colors text-red-600"
-                  >
-                    Sale
-                  </Link>
-                </div>
-                <div className="pt-6 border-t space-y-4">
-                  <Link href="/wishlist" className="block text-sm">
-                    Wishlist ({wishlistState.totalItems})
-                  </Link>
-                  <Link href="/cart" className="block text-sm">
-                    Cart ({cartState.totalItems})
-                  </Link>
-                  {authState.isAuthenticated ? (
-                    <>
-                      <Link href="/account" className="block text-sm">
-                        My Account
-                      </Link>
-                      <button onClick={logout} className="block text-sm text-left">
-                        Logout
-                      </button>
-                    </>
-                  ) : (
-                    <Link href="/login" className="block text-sm">
-                      Login
+                {categories.map((cat) => (
+                  <div key={cat.id}>
+                    <Link href={`/category/${cat.slug}`} className="block text-lg font-medium">
+                      {cat.name}
                     </Link>
-                  )}
-                </div>
+                    {cat.children?.map((sub) => (
+                      <Link
+                        key={sub.id}
+                        href={`/category/${cat.slug}/${sub.slug}`}
+                        className="block text-sm ml-4 text-gray-600"
+                      >
+                        {sub.name}
+                      </Link>
+                    ))}
+                  </div>
+                ))}
               </nav>
             </SheetContent>
           </Sheet>
 
           {/* Logo */}
-          {/* <Link href="/" className="mr-8 flex items-center space-x-2">
-            <span className="text-3xl font-light tracking-wider">FASHION</span>
-          </Link> */}
-
           <Link href="/" className="mr-8 flex items-center space-x-2">
-  <Image
-    src="/Logo Final (1).png" // 🔁 Your logo path (put the image in public folder)
-    alt="Fashion Logo"
-    width={120} // 🔁 Adjust size as needed
-    height={40}
-    priority
-  />
-</Link>
+            <Image
+              src="/Logo Final (1).png"
+              alt="Fashion Logo"
+              width={120}
+              height={40}
+              priority
+            />
+          </Link>
 
-          {/* Desktop navigation */}
-          <nav className="hidden md:flex items-center space-x-8 text-sm font-medium tracking-wide">
-            <Link href="/category/men" className="transition-colors hover:text-primary uppercase">
-             Men
-            </Link>
-            <Link href="/category/women" className="transition-colors hover:text-primary uppercase">
-            Women
-            </Link> 
-            <Link href="/category/kids" className="transition-colors hover:text-primary uppercase">
-            Kids
-            </Link>
-            <Link href="/category/baby" className="transition-colors hover:text-primary uppercase">
-            Baby
-            </Link>
-            {/* <Link href="/category/sports" className="transition-colors hover:text-red-600 uppercase text-red-600">
-            Sports
-            </Link> */}
+          {/* Desktop Navigation with Subcategories */}
+     <nav className="hidden md:flex items-center space-x-6 text-sm font-medium tracking-wide relative">
+  {categories.map((category) => (
+    <div key={category.id} className="group relative">
+      <Link
+        href={`/category/${category.slug}`}
+        className="transition-colors hover:text-primary uppercase"
+      >
+        {category.name}
+      </Link>
+
+      {category.children && category.children.length > 0 && (
+        <div className="absolute left-0 top-full mt-2 hidden group-hover:block bg-white shadow-md rounded-md w-48 z-50 subcollections">
+          <ul className="py-2">
+            {category.children.map((subcat) => (
+              <li key={subcat.id}>
+                <Link
+                  href={`/category/${subcat.slug}`} // ✅ Only use subcat.slug
+                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                >
+                  {subcat.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  ))}
+</nav>
 
 
-
-<Link href="/category/sports" className="transition-colors uppercase">
-            Sports
-            </Link>
-
-          </nav>
-
+          {/* Right Side: Search, Wishlist, Cart, User */}
           <div className="flex flex-1 items-center justify-end space-x-4">
-            {/* Desktop Live Search */}
             <div className="hidden sm:block">
               <LiveSearch className="w-[250px] lg:w-[350px]" />
             </div>
 
-            {/* Mobile search */}
             <Button variant="ghost" size="icon" className="sm:hidden" asChild>
               <Link href="/search">
                 <Search className="h-5 w-5" />
-                <span className="sr-only">Search</span>
               </Link>
             </Button>
 
-            {/* Wishlist */}
             <Button variant="ghost" size="icon" className="relative" asChild>
               <Link href="/wishlist">
                 <Heart className="h-5 w-5" />
@@ -164,28 +163,23 @@ export function Layout({ children }: LayoutProps) {
                     {wishlistState.totalItems > 99 ? "99+" : wishlistState.totalItems}
                   </span>
                 )}
-                <span className="sr-only">Wishlist</span>
               </Link>
             </Button>
 
-            {/* User account */}
             {authState.isAuthenticated ? (
               <Button variant="ghost" size="icon" asChild>
                 <Link href="/account">
                   <User className="h-5 w-5" />
-                  <span className="sr-only">Account</span>
                 </Link>
               </Button>
             ) : (
               <Button variant="ghost" size="icon" asChild>
                 <Link href="/login">
                   <User className="h-5 w-5" />
-                  <span className="sr-only">Login</span>
                 </Link>
               </Button>
             )}
 
-            {/* Cart */}
             <Button variant="ghost" size="icon" className="relative" onClick={toggleCart}>
               <ShoppingCart className="h-5 w-5" />
               {cartState.totalItems > 0 && (
@@ -193,84 +187,77 @@ export function Layout({ children }: LayoutProps) {
                   {cartState.totalItems > 99 ? "99+" : cartState.totalItems}
                 </span>
               )}
-              <span className="sr-only">Shopping cart</span>
             </Button>
-            {/* Right side actions */}
-                      <div className="flex items-center space-x-4">
-                        <LanguageToggle />
-                        <Button variant="ghost" size="sm" className="md:hidden">
-                          <Menu className="h-5 w-5" />
-                        </Button>
-                      </div>
+
+            <LanguageToggle />
           </div>
         </div>
       </header>
 
-      {/* Main content */}
       <main className="flex-1">{children}</main>
 
-      {/* Footer */}
+      {/* You can keep your existing footer */}
       <footer className="bg-black text-white">
         <div className="container py-16">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
             <div>
-              <h3 className="text-2xl font-light mb-6 tracking-wider">FASHION</h3>
+              <h3 className="text-2xl font-light mb-6 tracking-wider">{t("syra")}</h3>
               <p className="text-white/80 leading-relaxed">
-                Discover timeless elegance and contemporary style. Your destination for premium fashion.
+                {t("brand_description")}
               </p>
             </div>
-            <div>
-              <h4 className="font-medium mb-6 uppercase tracking-wide">Shop</h4>
+            <div className="ftrshopmenu">
+              <h4 className="font-medium mb-6 uppercase tracking-wide">{t("shop")}</h4>
               <ul className="space-y-3 text-white/80">
                 <li>
-                  <Link href="/category/womens-fashion" className="hover:text-white transition-colors">
-                    Women's Fashion
+                  <Link href="/category/women" className="hover:text-white transition-colors">
+                    {t("women")}
                   </Link>
                 </li>
                 <li>
-                  <Link href="/category/mens-fashion" className="hover:text-white transition-colors">
-                    Men's Fashion
+                  <Link href="/category/men" className="hover:text-white transition-colors">
+                    {t("men")}
                   </Link>
                 </li>
                 <li>
-                  <Link href="/category/accessories" className="hover:text-white transition-colors">
-                    Accessories
+                  <Link href="/category/kids" className="hover:text-white transition-colors">
+                    {t("kids")}
                   </Link>
                 </li>
                 <li>
-                  <Link href="/category/sale" className="hover:text-white transition-colors">
-                    Sale
+                  <Link href="/category/baby" className="hover:text-white transition-colors">
+                    {t("baby")}  
                   </Link>
                 </li>
               </ul>
             </div>
             <div>
-              <h4 className="font-medium mb-6 uppercase tracking-wide">Customer Care</h4>
+              <h4 className="font-medium mb-6 uppercase tracking-wide">{t("customer_care")}</h4>
               <ul className="space-y-3 text-white/80">
                 <li>
                   <Link href="/help" className="hover:text-white transition-colors">
-                    Help Center
+                    {t("help_center")}
                   </Link>
                 </li>
                 <li>
                   <Link href="/contact" className="hover:text-white transition-colors">
-                    Contact Us
+                    {t("contact_us")}
                   </Link>
                 </li>
                 <li>
                   <Link href="/shipping" className="hover:text-white transition-colors">
-                    Shipping & Returns
+                    {t("shipping_returns")}
                   </Link>
                 </li>
                 <li>
                   <Link href="/size-guide" className="hover:text-white transition-colors">
-                    Size Guide
+                    {t("size_guide")}
                   </Link>
                 </li>
               </ul>
             </div>
             <div>
-              <h4 className="font-medium mb-6 uppercase tracking-wide">Connect</h4>
+              {/* <h4 className="font-medium mb-6 uppercase tracking-wide">Connect</h4>
               <ul className="space-y-3 text-white/80">
                 <li>
                   <Link href="/newsletter" className="hover:text-white transition-colors">
@@ -292,11 +279,29 @@ export function Layout({ children }: LayoutProps) {
                     Twitter
                   </Link>
                 </li>
-              </ul>
+              </ul> */}
+
+ <h2 className="text-5xl font-light mb-6 tracking-tight">{t("stay_in_the_loop")}</h2>
+          {/* <p className="text-xl text-white/80 mb-12 max-w-2xl mx-auto">
+            Be the first to know about new arrivals, exclusive offers, and style tips from our fashion experts
+          </p> */}
+
+<div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto mb-8 ftrnewslter">
+            <input
+              type="email"
+              placeholder={t("enter_your_email")}
+              className="flex-1 px-6 py-4 rounded-full text-black text-lg"
+            />
+            <Button size="lg" className="bg-white text-black hover:bg-white/90 px-8 py-4 rounded-full">
+              {t("subscribe")}
+            </Button>
+          </div>
+
+
             </div>
           </div>
           <div className="mt-12 pt-8 border-t border-white/20 text-center text-white/60">
-            <p>&copy; 2024 Fashion Store. All rights reserved. | Privacy Policy | Terms of Service</p>
+            <p>{t("footer_lower_text")}</p>
           </div>
         </div>
       </footer>

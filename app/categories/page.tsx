@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Layout } from "@/components/layout"
+import { fetchCategories } from "@/lib/vtex-api";
 
 interface Category {
   id: string
@@ -31,8 +32,9 @@ export default function CategoriesPage() {
 
   useEffect(() => {
     const loadCategories = async () => {
+       const categories = await fetchCategories()
       try {
-        const response = await fetch("/api/categories")
+        const response = await fetch("/api/categories?level=3")
         if (!response.ok) {
           throw new Error("Failed to fetch categories")
         }

@@ -16,6 +16,9 @@ export interface CartItem {
   quantity: number
   linkText: string
   availableQuantity: number
+  productName_ar?: string
+  skuName_ar?: string
+brand_ar?: string
 }
 
 interface CartState {
@@ -67,17 +70,18 @@ function cartReducer(state: CartState, action: CartAction): CartState {
       } else {
         // Add new item
         const newItem: CartItem = {
-          productId: product.productId,
-          skuId: sku.itemId,
-          productName: product.productName,
-          skuName: sku.name,
-          brand: product.brand,
-          price,
-          listPrice,
-          imageUrl: sku.images[0]?.imageUrl || "",
-          quantity: Math.min(quantity, availableQuantity),
-          linkText: product.linkText,
-          availableQuantity,
+        productId: product.productId,
+  skuId: sku.itemId,
+  productName: product.productName,
+  productName_ar: product.Arabic_title?.[0] || product.productName,
+  skuName: sku.name,
+  brand: product.brand,
+  price,
+  listPrice,
+  imageUrl: sku.images[0]?.imageUrl || "",
+  quantity: Math.min(quantity, availableQuantity),
+  linkText: product.linkText,
+  availableQuantity,
         }
         newItems = [...state.items, newItem]
       }
