@@ -192,7 +192,7 @@ export function Layout({ children }: LayoutProps) {
               </Button>
             ) : (
               <Button variant="ghost" size="icon" asChild className="hidden md:block usericon">
-                <Link href="/login">
+                <Link className="desktop_login_icon" href="/login">
                   <User className="h-5 w-5" />
                 </Link>
               </Button>

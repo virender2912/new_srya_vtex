@@ -107,7 +107,9 @@ body {
     color: #FFFFF0;
 }
 
-
+.desktop_login_icon {
+    display: flex!important;
+}
 
 /* globals.css */
 
