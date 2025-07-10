@@ -205,7 +205,7 @@ useEffect(() => {
     <Layout>
       <div className="container py-8">
         {/* Breadcrumb */}
-        <nav className="flex items-center space-x-2 text-sm text-muted-foreground mb-6">
+        <nav className="flex items-center space-x-2 text-sm text-muted-foreground mb-6 breadcrumb">
           <Link href="/" className="hover:text-foreground">
             Home
           </Link>
@@ -218,7 +218,7 @@ useEffect(() => {
         </nav>
 
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold mb-4">{category.name}</h1>
           <p className="text-muted-foreground mb-4">{category.description}</p>
           <p className="text-sm text-muted-foreground">
@@ -276,7 +276,7 @@ useEffect(() => {
           </div>
 
           {/* Products Grid */}
-          <div className="flex-1">
+          <div className="flex-1 adding-padding">
             {/* View Toggle */}
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center space-x-2">
@@ -300,7 +300,7 @@ useEffect(() => {
             {/* Products */}
             {filteredProducts.length > 0 ? (
               <div
-                className={`grid gap-6 ${viewMode === "grid" ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" : "grid-cols-1"}`}
+                className={`grid gap-6 ${viewMode === "grid" ? "grid-cols-2 sm:grid-cols-2 lg:grid-cols-3" : "grid-cols-1 listview"}`}
               >
                 {filteredProducts.map((product) => (
                   <ProductCard key={product.productId} product={product} />

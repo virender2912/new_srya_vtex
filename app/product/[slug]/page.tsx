@@ -124,7 +124,7 @@ console.log("Add to Cart ➜", product)
   const description =
     isArabic && product.Arabic_description?.[0]
       ? product.Arabic_description[0]
-      : product.description || t("default_product_description")
+      : product.description 
 
   const currentSku = product.items[selectedSku]
   const bestPrice = getBestPrice(currentSku)
@@ -203,7 +203,7 @@ console.log("Add to Cart ➜", product)
           </div>
 
           {/* Product Info */}
-          <div className="space-y-8">
+          <div className="space-y-8 adding-padding">
             <div>
               <div className="flex items-start justify-between mb-4">
                 <div>
@@ -308,24 +308,24 @@ console.log("Add to Cart ➜", product)
               <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-lg">
                 <Truck className="h-5 w-5 text-primary" />
                 <div>
-                  <p className="font-medium">Free Shipping</p>
-                  <p className="text-sm text-muted-foreground">On orders over $75</p>
+                  <p className="font-medium">{t("freshiping")}</p>
+                  <p className="text-sm text-muted-foreground">{t("on_order")}</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-lg">
                 <RotateCcw className="h-5 w-5 text-primary" />
                 <div>
-                  <p className="font-medium">Easy Returns</p>
-                  <p className="text-sm text-muted-foreground">30-day return policy</p>
+                  <p className="font-medium">{t("easy_return")}</p>
+                  <p className="text-sm text-muted-foreground">{t("returnpolicy")}</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-lg">
                 <Shield className="h-5 w-5 text-primary" />
                 <div>
-                  <p className="font-medium">Secure Payment</p>
-                  <p className="text-sm text-muted-foreground">100% secure checkout</p>
+                  <p className="font-medium">{t("securpayment")}</p>
+                  <p className="text-sm text-muted-foreground">{t("securcheckout")}</p>
                 </div>
               </div>
             </div>
@@ -337,16 +337,16 @@ console.log("Add to Cart ➜", product)
         {/* Product Details Tabs */}
         <Tabs defaultValue="description" className="w-full">
           <TabsList className="grid w-full grid-cols-4 mb-8">
-            <TabsTrigger value="description" className="text-lg">
+            <TabsTrigger value="description" className="tabsname text-lg">
               {t("description")}
             </TabsTrigger>
-            <TabsTrigger value="specifications" className="text-lg">
+            <TabsTrigger value="specifications" className="tabsname text-lg">
               {t("details")}
             </TabsTrigger>
-            <TabsTrigger value="care" className="text-lg">
+            <TabsTrigger value="care" className="tabsname text-lg">
               {t("care_guide")}
             </TabsTrigger>
-            <TabsTrigger value="reviews" className="text-lg">
+            <TabsTrigger value="reviews" className="tabsname text-lg">
               {t("reviews")}
             </TabsTrigger>
           </TabsList>

@@ -13,18 +13,20 @@ import { Card, CardContent } from "@/components/ui/card"
 import { formatPrice, getBestPrice } from "@/lib/vtex-api"
 import type { VtexProduct } from "@/lib/vtex-api"
 
+import { useTranslation } from "@/hooks/use-translation"
 interface LiveSearchProps {
   className?: string
 }
 
 export function LiveSearch({ className }: LiveSearchProps) {
+  const { language } = useTranslation() 
   const [query, setQuery] = useState("")
   const [results, setResults] = useState<VtexProduct[]>([])
   const [loading, setLoading] = useState(false)
   const [showResults, setShowResults] = useState(false)
   const searchRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
-
+  
   // Debounced search
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -107,6 +109,8 @@ export function LiveSearch({ className }: LiveSearchProps) {
             {results.length > 0 ? (
               <div className="space-y-0">
                 {results.map((product) => {
+                  const arabicTitle = Array.isArray(product.Arabic_title) ? product.Arabic_title[0] : null
+  const title = language === "ar" && arabicTitle ? arabicTitle : product.productName
                   const firstSku = product.items[0]
                   const price = getBestPrice(firstSku)
                   const imageUrl = firstSku?.images[0]?.imageUrl
@@ -127,7 +131,12 @@ export function LiveSearch({ className }: LiveSearchProps) {
                         />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-sm line-clamp-1">{product.productName}</h4>
+
+                        <h4 className="font-medium text-sm line-clamp-1">
+                         {title}
+
+                        </h4>
+
                         <p className="text-xs text-muted-foreground">{product.brand}</p>
                         <p className="text-sm font-semibold">{formatPrice(price)}</p>
                       </div>

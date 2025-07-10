@@ -140,7 +140,13 @@ secure: "Secure checkout powered by VTEX",
 free_shipping: "Free shipping on orders over AED50",
 start_shopping: "Start Shopping",
 full_cart: "View Full Cart",
-quick_add: "Quick Add"
+quick_add: "Quick Add",
+freshiping: "Free Shipping",
+on_order: "On orders over $75",
+easy_return: "Easy Returns",
+returnpolicy: "30-day return policy",
+securpayment: "Secure Payment",
+securcheckout: "100% secure checkout",
 
   },
   ar: {
@@ -292,7 +298,13 @@ cartdrawer_text: "أضف بعض القطع الجميلة للبدء!",
 start_shopping: "ابدأ التسوق",
 securecheckout: "الخروج الآمن",
 full_cart: "عرض العربة كاملة",
-quick_add: "إضافة سريعة"
+quick_add: "إضافة سريعة",
+freshiping: "ًالشحن مجانا",
+on_order: "على الطلبات التي تزيد عن 75 دولارًا",
+easy_return: "عوائد سهلة",
+returnpolicy: "سياسة الإرجاع لمدة 30 يومًا",
+securpayment: "الدفع الآمن",
+securcheckout: "دفع آمن بنسبة 100%",
   },
 }
 

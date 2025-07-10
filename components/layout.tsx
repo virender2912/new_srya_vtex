@@ -78,6 +78,24 @@ export function Layout({ children }: LayoutProps) {
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="w-80">
+              <div>
+                
+            {authState.isAuthenticated ? (
+              <Button variant="ghost" size="icon" asChild>
+                <Link href="/account">
+                  <User className="h-5 w-5" />
+                </Link>
+              </Button>
+            ) : (
+              <Button variant="ghost" size="icon" asChild>
+                <Link href="/login">
+                  <User className="h-5 w-5" />
+                </Link>
+              </Button>
+            )}
+
+            <LanguageToggle/>
+              </div>
               {/* Mobile Nav (optional) */}
               <nav className="flex flex-col space-y-6 pt-6">
                 {categories.map((cat) => (
@@ -101,7 +119,7 @@ export function Layout({ children }: LayoutProps) {
           </Sheet>
 
           {/* Logo */}
-          <Link href="/" className="mr-8 flex items-center space-x-2">
+          <Link href="/" className="mr-8 flex items-center space-x-2 logoimage">
             <Image
               src="/Logo Final (1).png"
               alt="Fashion Logo"
@@ -144,18 +162,18 @@ export function Layout({ children }: LayoutProps) {
 
 
           {/* Right Side: Search, Wishlist, Cart, User */}
-          <div className="flex flex-1 items-center justify-end space-x-4">
+          <div className="flex flex-1 items-center justify-end space-x-4 headericons">
             <div className="hidden sm:block">
-              <LiveSearch className="w-[250px] lg:w-[350px]" />
+              <LiveSearch className="w-[250px] lg:w-[350px] livesearch" />
             </div>
 
-            <Button variant="ghost" size="icon" className="sm:hidden" asChild>
+            <Button variant="ghost" size="icon" className="sm:hidden searchbtn" asChild>
               <Link href="/search">
                 <Search className="h-5 w-5" />
               </Link>
             </Button>
 
-            <Button variant="ghost" size="icon" className="relative" asChild>
+            <Button variant="ghost" size="icon" className="relative wishlist" asChild>
               <Link href="/wishlist">
                 <Heart className="h-5 w-5" />
                 {wishlistState.totalItems > 0 && (
@@ -173,7 +191,7 @@ export function Layout({ children }: LayoutProps) {
                 </Link>
               </Button>
             ) : (
-              <Button variant="ghost" size="icon" asChild>
+              <Button variant="ghost" size="icon" asChild className="hidden md:block usericon">
                 <Link href="/login">
                   <User className="h-5 w-5" />
                 </Link>
@@ -188,8 +206,9 @@ export function Layout({ children }: LayoutProps) {
                 </span>
               )}
             </Button>
-
+<div className="hidden md:block">
             <LanguageToggle />
+            </div>
           </div>
         </div>
       </header>
@@ -198,7 +217,7 @@ export function Layout({ children }: LayoutProps) {
 
       {/* You can keep your existing footer */}
       <footer className="bg-black text-white">
-        <div className="container py-16">
+        <div className="container py-16 adding-padding">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
             <div>
               <h3 className="text-2xl font-light mb-6 tracking-wider">{t("syra")}</h3>

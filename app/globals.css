@@ -208,3 +208,57 @@ html[dir="rtl"] header .group.relative {
     margin-right: 15px;
     margin-left: 5px;
 }
+
+
+
+@media only screen and (min-width:1024px){
+.usericon {
+    display: flex;
+}
+}
+
+@media only screen and (max-width:750px){
+.ftrshopmenu {
+    padding-left: 0;
+}
+.adding-padding{
+   padding-right: 10px;
+    padding-left: 10px;
+}
+.brandsecton .transition-all {
+    margin-left: 10px!important;
+}
+.brandsecton .transition-all:first-child {
+    margin-left: 0px!important;
+}
+.max-w-2xl.heroslider.text-white {
+    text-align: center;
+}
+.sliderheading {
+    font-size: 46px;
+    margin-bottom: 0;
+}
+p.text-xl.mb-10.leading-relaxed.slidercntn {
+    font-size: 20px;
+    padding: 0 25px;
+}
+.sliderbtnright, .sliderbtnleft {
+    display: none;
+}
+.ftrdproducts .p-6 {
+    padding: 1rem 0.7rem;
+}
+.breadcrumb {
+    justify-content: center;
+}
+.tabsname {
+    font-size: 15px;
+}
+.headericons button, .headericons a {
+    margin-left: 0!important;
+}
+.logoimage {
+    margin-right: 0;
+    justify-content: end;
+}
+}

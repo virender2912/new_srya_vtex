@@ -25,16 +25,16 @@ const heroSlides = [
     link: "/category/men",
     theme: "dark",
   },
-  {
-    id: 2,
-    title: "slider_title_2",
-    subtitle: "slider_subtitle_2",
-    description: "slider_description_2",
-    cta: "slider_cta_2",
-    image: "/placeholder.svg?height=800&width=1400",
-    link: "/category/women",
-    theme: "light",
-  },
+  // {
+  //   id: 2,
+  //   title: "slider_title_2",
+  //   subtitle: "slider_subtitle_2",
+  //   description: "slider_description_2",
+  //   cta: "slider_cta_2",
+  //   image: "/placeholder.svg?height=800&width=1400",
+  //   link: "/category/women",
+  //   theme: "light",
+  // },
   {
     id: 3,
     title: "slider_title_3",
@@ -154,14 +154,14 @@ export default function HomePage() {
               <div className={`absolute inset-0 ${slide.theme === "dark" ? "bg-black/50" : "bg-white/30"}`} />
               <div className="absolute inset-0 flex items-center">
                 <div className="container">
-                  <div className={`max-w-2xl ${slide.theme === "light" ? "text-black" : "text-white"}`}>
+                  <div className={`max-w-2xl heroslider ${slide.theme === "light" ? "text-black" : "text-white"}`}>
                     <Badge
                       className={`mb-6 ${slide.theme === "light" ? "bg-black/10 text-black border-black/20" : "bg-white/20 text-white border-white/30"}`}
                     >
                       {/* {slide.subtitle} */}
                       {t(slide.subtitle as any)}
                     </Badge>
-                    <h1 className="text-6xl md:text-8xl font-light mb-8 leading-tight tracking-tight">
+                    <h1 className="text-6xl md:text-8xl font-light mb-8 leading-tight tracking-tight sliderheading">
                      {/* {slide.title} */}
                       {t(slide.title as any)}
 {/* {t("slider_title_1")} */}
@@ -169,7 +169,7 @@ export default function HomePage() {
 
                     </h1>
                     <p
-                      className={`text-xl mb-10 leading-relaxed ${slide.theme === "light" ? "text-black/80" : "text-white/90"}`}
+                      className={`text-xl mb-10 leading-relaxed slidercntn ${slide.theme === "light" ? "text-black/80" : "text-white/90"}`}
                     >
                  {t(slide.description as any)}
                     </p>
@@ -192,13 +192,13 @@ export default function HomePage() {
 
         <button
           onClick={prevSlide}
-          className="absolute left-6 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white p-3 rounded-full transition-all"
+          className="absolute left-6 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white p-3 rounded-full transition-all sliderbtnleft"
         >
           <ChevronLeft className="h-6 w-6" />
         </button>
         <button
           onClick={nextSlide}
-          className="absolute right-6 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white p-3 rounded-full transition-all"
+          className="absolute right-6 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white p-3 rounded-full transition-all sliderbtnright"
         >
           <ChevronRight className="h-6 w-6" />
         </button>
@@ -218,7 +218,7 @@ export default function HomePage() {
 
       {/* Categories Showcase */}
       <section className="py-20 categories-section">
-        <div className="container">
+        <div className="container adding-padding">
           <div className="text-center mb-16">
             <h2 className="text-5xl font-light mb-6 tracking-tight">
               {t("discover_your_style")}
@@ -293,8 +293,8 @@ export default function HomePage() {
       </section>
 
       {/* Featured Products */}
-      <section className="py-20 bg-gray-50">
-        <div className="container">
+      <section className="py-20 bg-gray-50 ftrdproducts">
+        <div className="container adding-padding">
           <div className="text-center mb-16">
             <h2 className="text-5xl font-light mb-6 tracking-tight">{t("trending_now")}</h2>
             <p className="text-xl text-muted-foreground">{t("discover_whats_capturing_hearts_this_season")}</p>
@@ -328,7 +328,7 @@ export default function HomePage() {
                   ))}
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                   {featuredProducts.map((product) => (
                     <ProductCard key={product.productId} product={product} />
                   ))}
@@ -337,7 +337,7 @@ export default function HomePage() {
             </TabsContent>
 
             <TabsContent value="new">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                 {newArrivals.map((product) => (
                   <ProductCard key={product.productId} product={product} />
                 ))}
@@ -345,7 +345,7 @@ export default function HomePage() {
             </TabsContent>
 
             <TabsContent value="sale">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                 {saleProducts.map((product) => (
                   <ProductCard key={product.productId} product={product} />
                 ))}
@@ -358,8 +358,8 @@ export default function HomePage() {
 
 
           {/* Brand Partners */}
-      <section className="py-12 border-b">
-        <div className="container">
+      <section className="py-12 border-b brandsecton">
+        <div className="container adding-padding">
           <div className="flex items-center justify-center space-x-12">
             {brandPartners.map((brand) => (
               <div key={brand.name} className="transition-all">
@@ -378,7 +378,7 @@ export default function HomePage() {
 
       {/* Lookbook Section */}
       <section className="py-20">
-        <div className="container">
+        <div className="container adding-padding">
           <div className="text-center mb-16">
             <h2 className="text-5xl font-light mb-6 tracking-tight">{t("style_inspiration")}</h2>
             <p className="text-xl text-muted-foreground">{t("curated_looks_for_every_occasion")}</p>
