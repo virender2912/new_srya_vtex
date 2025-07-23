@@ -144,12 +144,12 @@ const handleValidate = async () => {
 
 
 
-<div className="p-10">
+{/* <div className="p-10">
      
   <div>
       <button onClick={handleGoogleLogin}>Login with Google</button>
     </div>
-    </div>
+    </div> */}
 
 
       </Card>
