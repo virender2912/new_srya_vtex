@@ -107,9 +107,7 @@ body {
     color: #FFFFF0;
 }
 
-.desktop_login_icon {
-    display: flex!important;
-}
+
 
 /* globals.css */
 
@@ -210,12 +208,26 @@ html[dir="rtl"] header .group.relative {
     margin-right: 15px;
     margin-left: 5px;
 }
-
-
+.loginbtn {
+    border: 2px solid #000;
+    border-radius: 5px;
+    background: #000;
+    color: #fff;
+}
+.space-y-2.emailinput input {
+    border: 1px solid #000;
+    border-radius: 5px;
+}
+.loginbtn:hover {
+    background: #000;
+}
 
 @media only screen and (min-width:1024px){
 .usericon {
     display: flex;
+}
+.desktop_login_icon {
+    display: flex!important;
 }
 }
 

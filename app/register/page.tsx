@@ -194,7 +194,11 @@ export default function RegisterPage() {
                 </div>
 
                 <div className="flex items-center space-x-2">
-                  <Checkbox id="terms" checked={acceptTerms} onCheckedChange={setAcceptTerms} />
+                  <Checkbox 
+                    id="terms" 
+                    checked={acceptTerms} 
+                    onCheckedChange={(checked) => setAcceptTerms(checked === true)} 
+                  />
                   <Label htmlFor="terms" className="text-sm">
                     I agree to the{" "}
                     <Link href="/terms" className="text-primary hover:underline">

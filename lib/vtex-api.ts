@@ -259,6 +259,28 @@ export async function getProductById(productId: string): Promise<VtexProduct> {
   return products[0]
 }
 
+export async function sendToAudienceManager(email: string, token: string) {
+  const response = await fetch(
+    'https://iamtechiepartneruae.vtexcommercestable.com.br/api/audience-manager/pvt/audience',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-VTEX-API-AppKey': process.env.VTEX_APP_KEY!,
+        'X-VTEX-API-AppToken': process.env.VTEX_APP_TOKEN!,
+        'Proxy-Authorization': token,
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({ email }),
+    }
+  )
+
+  if (!response.ok) {
+    throw new Error('Failed to send to Audience Manager')
+  }
+
+  return response.json()
+}
 
 export async function getProductBySlug(slug: string): Promise<VtexProduct> {
   // Check if VTEX configuration is available

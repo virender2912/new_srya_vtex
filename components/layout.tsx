@@ -69,7 +69,7 @@ export function Layout({ children }: LayoutProps) {
 
       {/* Header */}
       <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
-        <div className="container flex h-20 items-center">
+        <div className="container flex h-20 items-center ">
           {/* Mobile Menu */}
           <Sheet>
             <SheetTrigger asChild>

@@ -86,7 +86,7 @@ function authReducer(state: AuthState, action: AuthAction): AuthState {
 const AuthContext = createContext<{
   state: AuthState
   dispatch: React.Dispatch<AuthAction>
-  login: (email: string, password: string) => Promise<void>
+  login: (email: string, password?: string, otpCode?: string) => Promise<void>
   register: (userData: {
     email: string
     password: string
@@ -125,30 +125,75 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [state.user])
 
-  const login = async (email: string, password: string) => {
-    dispatch({ type: "LOGIN_START" })
+const login = async (email: string, password?: string, otpCode?: string) => {
+  dispatch({ type: "LOGIN_START" })
 
-    try {
-      // Simulate API call - replace with actual VTEX authentication
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+  try {
+    // Step 1: Start session to get token
+ const startRes = await fetch("/api/login/start", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ email }),
+})
 
-      // Mock user data - replace with actual API response
-      const user: User = {
-        id: "user-123",
-        email,
-        firstName: "John",
-        lastName: "Doe",
-        phone: "+1234567890",
-        document: "123.456.789-00",
-        isEmailVerified: true,
+    const startData = await startRes.json()
+
+    if (!startRes.ok || !startData.token) {
+      dispatch({ type: "LOGIN_FAILURE" })
+      throw new Error(startData.error || "Failed to start login session")
+    }
+
+    const token = startData.token
+    localStorage.setItem("vtex_token", token)
+
+    if (!otpCode) {
+      // Step 2: Send OTP
+      const sendRes = await fetch("/api/login/send", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ email, token }),
+})
+
+      const sendData = await sendRes.json()
+
+      if (!sendRes.ok || !sendData.success) {
+        dispatch({ type: "LOGIN_FAILURE" })
+        throw new Error(sendData.error || "Failed to send OTP")
       }
 
-      dispatch({ type: "LOGIN_SUCCESS", payload: user })
-    } catch (error) {
-      dispatch({ type: "LOGIN_FAILURE" })
-      throw new Error("Login failed. Please check your credentials.")
+      // Wait for user to enter OTP in next step
+      return
     }
+
+    // Step 3: Validate OTP
+    const validateRes = await fetch("/api/login/validate", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ email, token, code: otpCode }),
+})
+
+    const validateData = await validateRes.json()
+
+    if (!validateRes.ok || !validateData.success) {
+      dispatch({ type: "LOGIN_FAILURE" })
+      throw new Error(validateData.error || "OTP validation failed")
+    }
+
+    const user: User = {
+      id: validateData.userId || "vtex-unknown",
+      email,
+      firstName: "Customer", // optional: fetch from another endpoint
+      lastName: "",
+      isEmailVerified: true,
+    }
+
+    dispatch({ type: "LOGIN_SUCCESS", payload: user })
+  } catch (error) {
+    dispatch({ type: "LOGIN_FAILURE" })
+    throw new Error("Login failed. Please try again.")
   }
+}
+
 
   const register = async (userData: {
     email: string
@@ -160,12 +205,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: "REGISTER_START" })
 
     try {
-      // Simulate API call - replace with actual VTEX user creation
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      const res = await fetch("/api/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
+      })
 
-      // Mock user data - replace with actual API response
-      const user: User = {
-        id: "user-" + Date.now(),
+      const data = await res.json()
+
+      if (!res.ok) {
+        dispatch({ type: "REGISTER_FAILURE" })
+        throw new Error(data.error || "Signup failed")
+      }
+
+      const user = JSON.parse(data.user)
+
+      localStorage.setItem("vtex_token", user.authenticationToken)
+
+      const registeredUser: User = {
+        id: data.data?.userId || "user-id",
         email: userData.email,
         firstName: userData.firstName,
         lastName: userData.lastName,
@@ -173,7 +233,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isEmailVerified: false,
       }
 
-      dispatch({ type: "REGISTER_SUCCESS", payload: user })
+      dispatch({ type: "REGISTER_SUCCESS", payload: registeredUser })
     } catch (error) {
       dispatch({ type: "REGISTER_FAILURE" })
       throw new Error("Registration failed. Please try again.")
@@ -182,18 +242,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = () => {
     dispatch({ type: "LOGOUT" })
+    localStorage.removeItem("vtex-user")
+    localStorage.removeItem("vtex_token")
   }
 
   return (
-    <AuthContext.Provider
-      value={{
-        state,
-        dispatch,
-        login,
-        register,
-        logout,
-      }}
-    >
+    <AuthContext.Provider value={{ state, dispatch, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   )

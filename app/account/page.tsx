@@ -31,17 +31,22 @@ export default function AccountPage() {
   })
 
   useEffect(() => {
-    if (!authState.isLoading && !authState.isAuthenticated) {
+  if (!authState.isLoading && !authState.isAuthenticated) {
+    const storedUser = localStorage.getItem('vtexUser')
+    if (storedUser) {
+      setFormData(JSON.parse(storedUser))
+    } else {
       router.push("/login")
-    } else if (authState.user) {
-      setFormData({
-        firstName: authState.user.firstName,
-        lastName: authState.user.lastName,
-        email: authState.user.email,
-        phone: authState.user.phone || "",
-      })
     }
-  }, [authState, router])
+  } else if (authState.user) {
+    setFormData({
+      firstName: authState.user.firstName,
+      lastName: authState.user.lastName,
+      email: authState.user.email,
+      phone: authState.user.phone || "",
+    })
+  }
+}, [authState, router])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -75,10 +80,12 @@ export default function AccountPage() {
       </Layout>
     )
   }
+const storedUser = typeof window !== "undefined" ? localStorage.getItem("vtexUser") : null
+const user = authState.user || (storedUser ? JSON.parse(storedUser) : null)
 
-  if (!authState.isAuthenticated || !authState.user) {
-    return null
-  }
+if (!user) {
+  return null
+}
 
   return (
     <Layout>
@@ -87,9 +94,9 @@ export default function AccountPage() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold">My Account</h1>
-            <p className="text-muted-foreground">
-              Welcome back, {authState.user.firstName} {authState.user.lastName}
-            </p>
+      <p className="text-muted-foreground">
+  Welcome back, {user.firstName} {user.lastName}
+</p>
           </div>
           <Button variant="outline" onClick={handleLogout}>
             <LogOut className="h-4 w-4 mr-2" />
