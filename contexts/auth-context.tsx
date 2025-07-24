@@ -126,6 +126,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [state.user])
 
 const login = async (email: string, password?: string, otpCode?: string) => {
+  localStorage.removeItem('vtexUser');
   dispatch({ type: "LOGIN_START" })
 
   try {
