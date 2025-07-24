@@ -145,11 +145,39 @@ const handleValidate = async () => {
 
 
 <div className="p-10">
-     
   <div>
-      <button onClick={handleGoogleLogin}>Login with Google</button>
-    </div>
-    </div>
+    <button
+      onClick={handleGoogleLogin}
+      className="flex items-center gap-2 border border-black rounded-md px-4 py-2 googlebtn"
+    >
+      <svg
+        width="20"
+        height="20"
+        viewBox="0 0 256 262"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M255.99 133.49c0-8.91-.8-17.48-2.31-25.76H130.6v48.83h70.54c-3.05 16.49-12.17 30.46-25.92 39.78v32.99h41.94c24.57-22.63 38.83-56.04 38.83-95.84z"
+          fill="#4285F4"
+        />
+        <path
+          d="M130.6 261c35.1 0 64.57-11.62 86.09-31.52l-41.94-32.99c-11.63 7.8-26.45 12.41-44.15 12.41-33.92 0-62.67-22.89-72.96-53.6H14.61v33.64c21.49 42.63 65.78 72.06 115.99 72.06z"
+          fill="#34A853"
+        />
+        <path
+          d="M57.64 155.3c-2.69-7.99-4.24-16.52-4.24-25.3 0-8.77 1.55-17.31 4.24-25.3V71.05H14.61C5.24 89.67 0 110.34 0 130c0 19.66 5.24 40.33 14.61 58.95l43.03-33.65z"
+          fill="#FBBC05"
+        />
+        <path
+          d="M130.6 51.07c18.99 0 35.97 6.53 49.38 19.37l37.06-37.06C195.17 13.1 165.7 0 130.6 0 80.39 0 36.1 29.43 14.61 71.05l43.03 33.65c10.29-30.71 39.04-53.6 72.96-53.6z"
+          fill="#EA4335"
+        />
+      </svg>
+      Login with Google
+    </button>
+  </div>
+</div>
+
 
 
       </Card>

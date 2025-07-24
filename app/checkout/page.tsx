@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
-import { ArrowLeft, CreditCard, Truck, Shield, Check } from "lucide-react"
+import { ArrowLeft, CreditCard, Truck, Shield, Check, ShoppingBag } from "lucide-react"
 import Link from "next/link"
 
 import { Button } from "@/components/ui/button"
@@ -18,6 +18,8 @@ import { Layout } from "@/components/layout"
 import { useCart } from "@/contexts/cart-context"
 import { useAuth } from "@/contexts/auth-context"
 import { formatPrice } from "@/lib/vtex-api"
+import { useTranslation } from "@/hooks/use-translation"
+import { useLanguage } from "@/contexts/language-context"
 
 interface ShippingAddress {
   firstName: string
@@ -42,6 +44,8 @@ interface PaymentMethod {
 export default function CheckoutPage() {
   const { state: cartState, clearCart } = useCart()
   const { state: authState } = useAuth()
+  const { t } = useTranslation()
+  const { language } = useLanguage()
   const router = useRouter()
 
   const [currentStep, setCurrentStep] = useState(1)
@@ -100,6 +104,8 @@ export default function CheckoutPage() {
   const validateStep = (step: number) => {
     switch (step) {
       case 1:
+        return cartState.items.length > 0
+      case 2:
         return (
           shippingAddress.firstName &&
           shippingAddress.lastName &&
@@ -108,9 +114,9 @@ export default function CheckoutPage() {
           shippingAddress.city &&
           shippingAddress.zipCode
         )
-      case 2:
-        return selectedShipping
       case 3:
+        return selectedShipping
+      case 4:
         if (paymentMethod.type === "credit" || paymentMethod.type === "debit") {
           return paymentMethod.cardNumber && paymentMethod.expiryDate && paymentMethod.cvv && paymentMethod.cardName
         }
@@ -131,6 +137,8 @@ export default function CheckoutPage() {
           seller: "1",
           price: item.price,
         })),
+
+        
         clientProfileData: {
           email: shippingAddress.email,
           firstName: shippingAddress.firstName,
@@ -215,6 +223,7 @@ export default function CheckoutPage() {
               <Button variant="outline" size="lg" asChild>
                 <Link href="/products">Continue Shopping</Link>
               </Button>
+              
             </div>
           </div>
         </div>
@@ -241,7 +250,7 @@ export default function CheckoutPage() {
 
         {/* Progress Steps */}
         <div className="flex items-center justify-center mb-12">
-          {[1, 2, 3, 4].map((step) => (
+          {[1, 2, 3, 4, 5].map((step) => (
             <div key={step} className="flex items-center">
               <div
                 className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium ${
@@ -250,7 +259,7 @@ export default function CheckoutPage() {
               >
                 {step}
               </div>
-              {step < 4 && <div className={`w-16 h-1 mx-2 ${step < currentStep ? "bg-primary" : "bg-muted"}`} />}
+              {step < 5 && <div className={`w-16 h-1 mx-2 ${step < currentStep ? "bg-primary" : "bg-muted"}`} />}
             </div>
           ))}
         </div>
@@ -258,8 +267,87 @@ export default function CheckoutPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
-            {/* Step 1: Shipping Address */}
+            {/* Step 1: Cart Items Review */}
             {currentStep === 1 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <ShoppingBag className="h-5 w-5" />
+                    Review Your Cart Items
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="space-y-4">
+                    {cartState.items.map((item) => (
+                      <div key={`${item.productId}-${item.skuId}`} className="flex gap-4 p-4 border rounded-lg">
+                        <div className="relative w-24 h-24 rounded-lg overflow-hidden border">
+                          <Image
+                            src={item.imageUrl || "/placeholder.svg?height=96&width=96"}
+                            alt={item.productName}
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <Link
+                                href={`/product/${item.linkText}`}
+                                className="block hover:text-primary transition-colors"
+                              >
+                                <h3 className="font-semibold text-lg line-clamp-2">
+                                  {language === "ar"
+                                    ? item.productName_ar?.trim() || item.productName
+                                    : item.productName}
+                                </h3>
+                                {item.skuName !== item.productName && (
+                                  <p className="text-sm text-muted-foreground mt-1">{item.skuName}</p>
+                                )}
+                              </Link>
+                              <p className="text-sm text-muted-foreground mt-1">{item.brand}</p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center justify-between mt-4">
+                            <div className="flex items-center gap-3">
+                              <span className="text-sm text-muted-foreground">Quantity: {item.quantity}</span>
+                            </div>
+
+                            <div className="text-right">
+                              <div className="flex items-center gap-2">
+                                <span className="font-semibold text-lg">{formatPrice(item.price)}</span>
+                                {item.listPrice > item.price && (
+                                  <span className="text-sm text-muted-foreground line-through">
+                                    {formatPrice(item.listPrice)}
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-sm text-muted-foreground">
+                                {t("total")}: {formatPrice(item.price * item.quantity)}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="flex justify-between items-center pt-4 border-t">
+                    <div>
+                      <p className="text-sm text-muted-foreground">{cartState.totalItems} items</p>
+                      <p className="font-semibold text-lg">{formatPrice(cartState.totalPrice)}</p>
+                    </div>
+                    <Button onClick={() => setCurrentStep(2)} className="w-auto">
+                      Continue to Shipping
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Step 2: Shipping Address */}
+            {currentStep === 2 && (
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -358,15 +446,20 @@ export default function CheckoutPage() {
                     </div>
                   </div>
 
-                  <Button onClick={() => setCurrentStep(2)} disabled={!validateStep(1)} className="w-full">
-                    Continue to Shipping
-                  </Button>
+                  <div className="flex gap-4">
+                    <Button variant="outline" onClick={() => setCurrentStep(1)} className="flex-1">
+                      Back
+                    </Button>
+                    <Button onClick={() => setCurrentStep(3)} disabled={!validateStep(2)} className="flex-1">
+                      Continue to Shipping Method
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             )}
 
-            {/* Step 2: Shipping Method */}
-            {currentStep === 2 && (
+            {/* Step 3: Shipping Method */}
+            {currentStep === 3 && (
               <Card>
                 <CardHeader>
                   <CardTitle>Shipping Method</CardTitle>
@@ -390,10 +483,10 @@ export default function CheckoutPage() {
                   </RadioGroup>
 
                   <div className="flex gap-4 mt-6">
-                    <Button variant="outline" onClick={() => setCurrentStep(1)} className="flex-1">
+                    <Button variant="outline" onClick={() => setCurrentStep(2)} className="flex-1">
                       Back
                     </Button>
-                    <Button onClick={() => setCurrentStep(3)} className="flex-1">
+                    <Button onClick={() => setCurrentStep(4)} className="flex-1">
                       Continue to Payment
                     </Button>
                   </div>
@@ -401,8 +494,8 @@ export default function CheckoutPage() {
               </Card>
             )}
 
-            {/* Step 3: Payment */}
-            {currentStep === 3 && (
+            {/* Step 4: Payment */}
+            {currentStep === 4 && (
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -477,10 +570,10 @@ export default function CheckoutPage() {
                   )}
 
                   <div className="flex gap-4">
-                    <Button variant="outline" onClick={() => setCurrentStep(2)} className="flex-1">
+                    <Button variant="outline" onClick={() => setCurrentStep(3)} className="flex-1">
                       Back
                     </Button>
-                    <Button onClick={() => setCurrentStep(4)} disabled={!validateStep(3)} className="flex-1">
+                    <Button onClick={() => setCurrentStep(5)} disabled={!validateStep(4)} className="flex-1">
                       Review Order
                     </Button>
                   </div>
@@ -488,15 +581,19 @@ export default function CheckoutPage() {
               </Card>
             )}
 
-            {/* Step 4: Review */}
-            {currentStep === 4 && (
+            {/* Step 5: Review */}
+            {currentStep === 5 && (
               <Card>
                 <CardHeader>
                   <CardTitle>Review Your Order</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="flex items-center space-x-2">
-                    <Checkbox id="terms" checked={agreeTerms} onCheckedChange={setAgreeTerms} />
+                    <Checkbox 
+                      id="terms" 
+                      checked={agreeTerms} 
+                      onCheckedChange={(checked) => setAgreeTerms(checked === true)} 
+                    />
                     <Label htmlFor="terms" className="text-sm">
                       I agree to the{" "}
                       <Link href="/terms" className="text-primary hover:underline">
@@ -510,7 +607,7 @@ export default function CheckoutPage() {
                   </div>
 
                   <div className="flex gap-4">
-                    <Button variant="outline" onClick={() => setCurrentStep(3)} className="flex-1">
+                    <Button variant="outline" onClick={() => setCurrentStep(4)} className="flex-1">
                       Back
                     </Button>
                     <Button onClick={placeOrder} disabled={!agreeTerms || loading} className="flex-1">
@@ -542,7 +639,11 @@ export default function CheckoutPage() {
                         />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-sm line-clamp-2">{item.productName}</h4>
+                        <h4 className="font-medium text-sm line-clamp-2">
+                          {language === "ar"
+                            ? item.productName_ar?.trim() || item.productName
+                            : item.productName}
+                        </h4>
                         <p className="text-xs text-muted-foreground">Qty: {item.quantity}</p>
                         <p className="text-sm font-medium">{formatPrice(item.price * item.quantity)}</p>
                       </div>

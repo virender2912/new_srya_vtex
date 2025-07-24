@@ -1,9 +1,58 @@
 // VTEX API configuration and utilities
-const VTEX_ACCOUNT = process.env.NEXT_PUBLIC_VTEX_ACCOUNT || "iamtechiepartneruae"
-const VTEX_ENVIRONMENT = process.env.NEXT_PUBLIC_VTEX_ENVIRONMENT || "vtexcommercestable"
-
+export const VTEX_ACCOUNT = process.env.NEXT_PUBLIC_VTEX_ACCOUNT || "iamtechiepartneruae"
+export const VTEX_ENVIRONMENT = process.env.NEXT_PUBLIC_VTEX_ENVIRONMENT || "vtexcommercestable"
 
 const BASE_URL = `https://${VTEX_ACCOUNT}.${VTEX_ENVIRONMENT}.com.br`
+
+export const VTEX_CONFIG = {
+  accountName: VTEX_ACCOUNT,
+  environment: VTEX_ENVIRONMENT,
+  appKey: process.env.VTEX_API_KEY || process.env.VTEX_APP_KEY,
+  appToken: process.env.VTEX_API_TOKEN || process.env.VTEX_APP_TOKEN,
+  locale: "en-US"
+}
+
+// Check if we have proper authentication
+export const hasVTEXCredentials = !!(VTEX_CONFIG.appKey && VTEX_CONFIG.appToken)
+
+export const vtexHeaders = {
+  "Content-Type": "application/json",
+  Accept: "application/json",
+  ...(VTEX_CONFIG.appKey &&
+    VTEX_CONFIG.appToken && {
+      "X-VTEX-API-AppKey": VTEX_CONFIG.appKey,
+      "X-VTEX-API-AppToken": VTEX_CONFIG.appToken,
+    }),
+}
+
+export const VTEX_ENDPOINTS = {
+  orderForm: (orderFormId?: string) =>
+    `https://${VTEX_ACCOUNT}.${VTEX_ENVIRONMENT}.com.br/api/checkout/pub/orderForm${orderFormId ? `/${orderFormId}` : ""}`,
+  addItems: (orderFormId: string) =>
+    `https://${VTEX_ACCOUNT}.${VTEX_ENVIRONMENT}.com.br/api/checkout/pub/orderForm/${orderFormId}/items`,
+  updateItems: (orderFormId: string) =>
+    `https://${VTEX_ACCOUNT}.${VTEX_ENVIRONMENT}.com.br/api/checkout/pub/orderForm/${orderFormId}/items/update`,
+  removeItems: (orderFormId: string) =>
+    `https://${VTEX_ACCOUNT}.${VTEX_ENVIRONMENT}.com.br/api/checkout/pub/orderForm/${orderFormId}/items/update`,
+  // Direct checkout URL - goes to cart review step first
+  checkout: (orderFormId: string) =>
+    `https://${VTEX_ACCOUNT}.vtexcommercestable.com.br/checkout/?orderFormId=${orderFormId}#/orderform`,
+  // Alternative checkout URL with orderFormId parameter
+  checkoutWithId: (orderFormId: string) =>
+    `https://${VTEX_ACCOUNT}.vtexcommercestable.com.br/checkout/?orderFormId=${orderFormId}`,
+  // Checkout gateway
+  gateway: (orderFormId: string) =>
+    `https://${VTEX_ACCOUNT}.${VTEX_ENVIRONMENT}.com.br/api/checkout/pub/gateway/orderForm/${orderFormId}`,
+  // Prepare checkout
+  attachments: (orderFormId: string) =>
+    `https://${VTEX_ACCOUNT}.${VTEX_ENVIRONMENT}.com.br/api/checkout/pub/orderForm/${orderFormId}/attachments`,
+  search: (query?: string, from = 0, to = 49) =>
+    `https://${VTEX_ACCOUNT}.${VTEX_ENVIRONMENT}.com.br/api/catalog_system/pub/products/search${query ? `?fq=${encodeURIComponent(query)}` : ""}${query ? "&" : "?"}_from=${from}&_to=${to}`,
+  productById: (productId: string) =>
+    `https://${VTEX_ACCOUNT}.${VTEX_ENVIRONMENT}.com.br/api/catalog_system/pub/products/search?fq=productId:${productId}`,
+  categories: () =>
+    `https://${VTEX_ACCOUNT}.${VTEX_ENVIRONMENT}.com.br/api/catalog_system/pub/category/tree/1`,
+}
 
 // Types for VTEX API responses
 export interface VtexProduct {
@@ -29,7 +78,34 @@ export interface VtexProduct {
   items: VtexSku[]
   Arabic_title?: string[]
   Arabic_description?: string[]
+  // Additional properties for cart compatibility
+  id?: string
+  name?: string
+  price?: number
+  imageUrl?: string
+  quantity?: number
 }
+
+export interface VTEXOrderForm {
+  orderFormId: string
+  items: Array<{
+    id: string
+    productId: string
+    name: string
+    price: number
+    imageUrl: string
+    quantity: number
+    seller: string
+    availableQuantity?: number
+  }>
+  totalizers: Array<{
+    id: string
+    name: string
+    value: number
+  }>
+  value: number
+}
+
 
 export interface VtexSku {
   itemId: string
@@ -259,28 +335,6 @@ export async function getProductById(productId: string): Promise<VtexProduct> {
   return products[0]
 }
 
-export async function sendToAudienceManager(email: string, token: string) {
-  const response = await fetch(
-    'https://iamtechiepartneruae.vtexcommercestable.com.br/api/audience-manager/pvt/audience',
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-VTEX-API-AppKey': process.env.VTEX_APP_KEY!,
-        'X-VTEX-API-AppToken': process.env.VTEX_APP_TOKEN!,
-        'Proxy-Authorization': token,
-        'Accept': 'application/json',
-      },
-      body: JSON.stringify({ email }),
-    }
-  )
-
-  if (!response.ok) {
-    throw new Error('Failed to send to Audience Manager')
-  }
-
-  return response.json()
-}
 
 export async function getProductBySlug(slug: string): Promise<VtexProduct> {
   // Check if VTEX configuration is available
@@ -363,8 +417,11 @@ export function formatPrice(price: number) {
 
 // Get best available price from SKU
 export function getBestPrice(sku: VtexSku): number {
-  const seller = sku.sellers.find((s) => s.sellerDefault) || sku.sellers[0]
-  return seller?.commertialOffer?.Price || 0
+  if (!sku || !Array.isArray(sku.sellers) || sku.sellers.length === 0) {
+    return 0;
+  }
+  const seller = sku.sellers.find((s) => s.sellerDefault) || sku.sellers[0];
+  return seller?.commertialOffer?.Price || 0;
 }
 
 // Get best available list price from SKU
@@ -380,4 +437,56 @@ export function isProductAvailable(sku: VtexSku): boolean {
   const seller = sku.sellers.find((s) => s.sellerDefault) || sku.sellers[0]
   return seller?.commertialOffer?.IsAvailable || false
 }
+
+// Get available quantity for a product SKU
+export function getAvailableQuantity(sku: VtexSku): number {
+  const seller = sku.sellers.find((s) => s.sellerDefault) || sku.sellers[0]
+  return seller?.commertialOffer?.AvailableQuantity || 0
+}
+
+// Fetch product information for cart items (works without authentication)
+export async function getProductInfo(productId: string, skuId: string): Promise<{
+  name: string
+  price: number
+  imageUrl: string
+  availableQuantity: number
+}> {
+  try {
+    const product = await getProductById(productId)
+    const sku = product.items.find(item => item.itemId === skuId)
+    
+    if (!sku) {
+      throw new Error("SKU not found")
+    }
+
+    const seller = sku.sellers.find(s => s.sellerDefault) || sku.sellers[0]
+    if (!seller) {
+      throw new Error("No seller found")
+    }
+
+    const imageUrl = sku.images?.[0]?.imageUrl || "/placeholder.svg"
+    const price = seller.commertialOffer.Price || 0
+    const availableQuantity = seller.commertialOffer.AvailableQuantity || 0
+
+    return {
+      name: product.productName,
+      price: price,
+      imageUrl: imageUrl,
+      availableQuantity: availableQuantity
+    }
+  } catch (error) {
+    console.warn("Failed to fetch product info:", error)
+    // Return fallback data
+    return {
+      name: `Product ${productId}`,
+      price: 0,
+      imageUrl: "/placeholder.svg",
+      availableQuantity: 10
+    }
+  }
+}
+
+
+
+
 

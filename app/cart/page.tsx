@@ -13,10 +13,13 @@ import { formatPrice } from "@/lib/vtex-api"
   import { useTranslation } from "@/hooks/use-translation"
   import { useLanguage } from "@/contexts/language-context"
 export default function CartPage() {
-  const { state, removeItem, updateQuantity, clearCart } = useCart()
+  const { state, removeItem, updateQuantity, clearCart, proceedToCheckout, orderForm, loading, error } = useCart()
   console.log("Cart items ➜", state.items)
-const { t } = useTranslation()
-const { language } = useLanguage()
+  console.log("OrderForm ➜", orderForm)
+  
+  const { t } = useTranslation()
+  const { language } = useLanguage()
+
   if (state.items.length === 0) {
     return (
       <Layout>
@@ -39,6 +42,17 @@ const { language } = useLanguage()
     )
   }
 
+  // Handler for Secure Checkout - use the same flow as cart drawer
+  const handleSecureCheckout = async () => {
+    if (!Array.isArray(state.items) || state.items.length === 0) {
+      alert("Your cart is empty!")
+      return
+    }
+    
+    // Use the proper checkout flow from cart context (same as cart drawer)
+    proceedToCheckout()
+  }
+
   return (
     <Layout>
       <div className="container py-8">
@@ -55,6 +69,13 @@ const { language } = useLanguage()
           </div>
         </div>
 
+        {error && (
+          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-red-600 text-sm">{error}</p>
+          </div>
+        )}
+
+       
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Cart Items */}
           <div className="lg:col-span-2 space-y-4">
@@ -79,10 +100,10 @@ const { language } = useLanguage()
                             className="block hover:text-primary transition-colors"
                           >
                             <h3 className="font-semibold text-lg line-clamp-2">
-  {language === "ar"
-    ? item.productName_ar?.trim() || item.productName
-    : item.productName}
-</h3>
+                              {/* {language === "ar"
+                                ? item.productName_ar?.trim() || item.productName
+                                : item.productName} */}
+                              </h3>
                             {item.skuName !== item.productName && (
                               <p className="text-sm text-muted-foreground mt-1">{item.skuName}</p>
                             )}
@@ -107,21 +128,23 @@ const { language } = useLanguage()
                             size="icon"
                             className="h-8 w-8"
                             onClick={() => updateQuantity(item.productId, item.skuId, item.quantity - 1)}
-                            disabled={item.quantity <= 1}
+                            disabled={item.quantity <= 1 || loading}
                           >
                             <Minus className="h-4 w-4" />
                           </Button>
-                          <span className="font-medium w-12 text-center">{item.quantity}</span>
+                          <span className="font-medium w-12 text-center">
+                            {loading ? "..." : item.quantity}
+                          </span>
                           <Button
                             variant="outline"
                             size="icon"
                             className="h-8 w-8"
                             onClick={() => updateQuantity(item.productId, item.skuId, item.quantity + 1)}
-                            disabled={item.quantity >= item.availableQuantity}
+                            disabled={item.quantity >= item.availableQuantity || loading}
                           >
                             <Plus className="h-4 w-4" />
                           </Button>
-                        </div>
+                        </div> 
 
                         <div className="text-right">
                           <div className="flex items-center gap-2">
@@ -181,7 +204,7 @@ const { language } = useLanguage()
                 </div>
 
                 <div className="space-y-2">
-                  <Button className="w-full" size="lg">
+                  <Button className="w-full" size="lg" onClick={handleSecureCheckout}>
                     {t("proceed_checkout")}
                   </Button>
                   <Button variant="outline" className="w-full" asChild>

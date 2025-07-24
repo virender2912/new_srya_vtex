@@ -222,6 +222,11 @@ html[dir="rtl"] header .group.relative {
     background: #000;
 }
 
+.googlebtn{
+      width: 100%;
+    justify-content: center;
+}
+
 @media only screen and (min-width:1024px){
 .usericon {
     display: flex;

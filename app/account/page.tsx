@@ -30,13 +30,44 @@ export default function AccountPage() {
     phone: "",
   })
 
-  useEffect(() => {
+useEffect(() => {
+  const getUserFromCookies = () => {
+    if (typeof document === "undefined") return null
+    const cookieObj = Object.fromEntries(
+      document.cookie.split("; ").map(c => {
+        const [key, ...v] = c.split("=")
+        return [key, decodeURIComponent(v.join("="))]
+      })
+    )
+    const fullName = cookieObj.customerName || ""
+    const email = cookieObj.customerEmail || ""
+    const [firstName, ...rest] = fullName.split(" ")
+    const lastName = rest.join(" ")
+
+    if (email && fullName) {
+      return {
+        firstName,
+        lastName,
+        email,
+        phone: "", // You can pull this from VTEX API if needed
+      }
+    }
+
+    return null
+  }
+
   if (!authState.isLoading && !authState.isAuthenticated) {
-    const storedUser = localStorage.getItem('vtexUser')
-    if (storedUser) {
-      setFormData(JSON.parse(storedUser))
+    const cookieUser = getUserFromCookies()
+    if (cookieUser) {
+      setFormData(cookieUser)
+      localStorage.setItem("vtexUser", JSON.stringify(cookieUser))
     } else {
-      router.push("/login")
+      const storedUser = localStorage.getItem("vtexUser")
+      if (storedUser) {
+        setFormData(JSON.parse(storedUser))
+      } else {
+        router.push("/login")
+      }
     }
   } else if (authState.user) {
     setFormData({
@@ -80,8 +111,11 @@ export default function AccountPage() {
       </Layout>
     )
   }
-const storedUser = typeof window !== "undefined" ? localStorage.getItem("vtexUser") : null
-const user = authState.user || (storedUser ? JSON.parse(storedUser) : null)
+const storedUser =
+  typeof window !== "undefined" ? localStorage.getItem("vtexUser") : null
+const user =
+  authState.user ||
+  (storedUser ? JSON.parse(storedUser) : null)
 
 if (!user) {
   return null

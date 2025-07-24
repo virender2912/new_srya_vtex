@@ -137,11 +137,27 @@ console.log("Add to Cart ➜", product)
   const images = currentSku?.images || []
   const currentImage = images[selectedImageIndex]
 
-  const handleAddToCart = () => {
+  // const handleAddToCart = () => {
+  //   if (isAvailable && quantity > 0) {
+  //     addItem(product, currentSku, quantity)
+  //   }
+  // }
+
+   const handleAddToCart = () => {
     if (isAvailable && quantity > 0) {
-      addItem(product, currentSku, quantity)
+      // Pass product information for better cart display
+      const productInfo = {
+        name: product.productName,
+        brand: product.brand,
+        imageUrl: currentImage?.imageUrl,
+        price: bestPrice,
+        listPrice: listPrice,
+        linkText: product.linkText,
+      }
+      addItem(product.productId, currentSku.itemId, quantity, "1", productInfo)
     }
   }
+
 
   const handleWishlistToggle = () => {
     if (inWishlist) {
