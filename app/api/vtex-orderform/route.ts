@@ -2,8 +2,8 @@
 import { NextRequest, NextResponse } from "next/server"
 const VTEX_ACCOUNT = process.env.VTEX_ACCOUNT!
 const VTEX_ENVIRONMENT = process.env.VTEX_ENVIRONMENT!
-const VTEX_API_KEY = process.env.VTEX_API_KEY!
-const VTEX_API_TOKEN = process.env.VTEX_API_TOKEN!
+const VTEX_API_APP_KEY = process.env.VTEX_API_APP_KEY!
+const VTEX_API_APP_TOKEN = process.env.VTEX_API_APP_TOKEN!
 
 export async function POST(req: Request) {
   const body = await req.json()
@@ -23,8 +23,8 @@ export async function POST(req: Request) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-VTEX-API-AppKey": VTEX_API_KEY,
-          "X-VTEX-API-AppToken": VTEX_API_TOKEN,
+          "X-VTEX-API-AppKey": VTEX_API_APP_KEY,
+          "X-VTEX-API-AppToken": VTEX_API_APP_TOKEN,
            "locale": "en-US",
         },
       }
@@ -44,8 +44,8 @@ export async function POST(req: Request) {
     headers: {
       "Content-Type": "application/json",
       "Accept": "application/json",
-      "X-VTEX-API-AppKey": VTEX_API_KEY,
-      "X-VTEX-API-AppToken": VTEX_API_TOKEN,
+      "X-VTEX-API-AppKey": VTEX_API_APP_KEY,
+      "X-VTEX-API-AppToken": VTEX_API_APP_TOKEN,
        "locale": "en-US",
          
     },
@@ -60,8 +60,8 @@ export async function POST(req: Request) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-VTEX-API-AppKey": VTEX_API_KEY,
-          "X-VTEX-API-AppToken": VTEX_API_TOKEN,
+          "X-VTEX-API-AppKey": VTEX_API_APP_KEY,
+          "X-VTEX-API-AppToken": VTEX_API_APP_TOKEN,
         },
         body: JSON.stringify({
           items: items.map((item: any) => ({
