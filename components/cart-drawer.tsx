@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { useCart } from "@/contexts/cart-context"
 import { formatPrice } from "@/lib/vtex-api"
+import { formatPricee } from "@/lib/vtex-api"
 import { useTranslation } from "@/hooks/use-translation"
 import { useLanguage } from "@/contexts/language-context"
 import { useEffect, useState } from "react"
@@ -142,14 +143,14 @@ export function CartDrawer() {
 
                       <div className="flex items-center justify-between mt-2">
                         <div className="flex items-center gap-2">
-                          <span className="font-semibold text-sm">{formatPrice(item.price)} </span>
+                          <span className="font-semibold text-sm">{formatPricee(item.price)} </span>
                           {item.listPrice > item.price && (
                             <span className="text-xs text-muted-foreground line-through"> 
-                              {formatPrice(item.listPrice)}
+                              {formatPricee(item.listPrice)}
                             </span>
                           )}
                         </div>
-                        <span className="text-sm font-semibold">{formatPrice(item.price * item.quantity)}</span>
+                        <span className="text-sm font-semibold">{formatPricee(item.price * item.quantity)}</span>
                       </div>
                     </div>
                   </div>
@@ -161,7 +162,7 @@ export function CartDrawer() {
             <div className="border-t pt-6 space-y-4">
               <div className="flex items-center justify-between text-xl font-semibold">
                 <span>{t("total")}</span>
-                <span>{formatPrice(state.totalPrice)}</span>
+                <span>{formatPricee(state.totalPrice)}</span>
               </div>
 
               <div className="space-y-3">

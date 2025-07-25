@@ -419,6 +419,18 @@ export function formatPrice(price: number) {
 }
 
 
+
+export function formatPricee(price: number) {
+  console.log('checkk price',price)
+  return new Intl.NumberFormat("en-AE", {
+    style: "currency",
+    currency: "AED",
+  }).format(price / 10000)
+
+  
+}
+
+
 // export function formatPrice(price: number, currency: string = "SAR") {
 //   return new Intl.NumberFormat("en-SA", {
 //     style: "currency",

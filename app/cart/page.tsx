@@ -10,6 +10,7 @@ import { Separator } from "@/components/ui/separator"
 import { Layout } from "@/components/layout"
 import { useCart } from "@/contexts/cart-context"
 import { formatPrice } from "@/lib/vtex-api"
+import { formatPricee } from "@/lib/vtex-api"
   import { useTranslation } from "@/hooks/use-translation"
   import { useLanguage } from "@/contexts/language-context"
 export default function CartPage() {
@@ -148,15 +149,15 @@ export default function CartPage() {
 
                         <div className="text-right">
                           <div className="flex items-center gap-2">
-                            <span className="font-semibold text-lg">{formatPrice(item.price)}</span>
+                            <span className="font-semibold text-lg">{formatPricee(item.price)}</span>
                             {item.listPrice > item.price && (
                               <span className="text-sm text-muted-foreground line-through">
-                                {formatPrice(item.listPrice)}
+                                {formatPricee(item.listPrice)}
                               </span>
                             )}
                           </div>
                           <p className="text-sm text-muted-foreground">
-                            {t("total")}: {formatPrice(item.price * item.quantity)}
+                            {t("total")}: {formatPricee(item.price * item.quantity)}
                           </p>
                         </div>
                       </div>
@@ -184,7 +185,7 @@ export default function CartPage() {
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span>{t("subtotal")} ({state.totalItems} {t("items")})</span>
-                    <span>{formatPrice(state.totalPrice)}</span>
+                    <span>{formatPricee(state.totalPrice)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>{t("shipping")}</span>
@@ -200,7 +201,7 @@ export default function CartPage() {
 
                 <div className="flex justify-between text-lg font-semibold">
                   <span>{t("total")}</span>
-                  <span>{formatPrice(state.totalPrice)}</span>
+                  <span>{formatPricee(state.totalPrice)}</span>
                 </div>
 
                 <div className="space-y-2">
