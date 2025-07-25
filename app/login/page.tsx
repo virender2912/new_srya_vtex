@@ -142,9 +142,9 @@ const handleValidate = async () => {
 
 
 <div className="mt-6 text-center space-y-2">
-                <Link href="/forgot-password" className="text-sm text-primary hover:underline">
+                {/* <Link href="/forgot-password" className="text-sm text-primary hover:underline">
                   Forgot your password?
-                </Link>
+                </Link> */}
                 <p className="text-sm text-muted-foreground">
                   Don't have an account?{" "}
                   <Link href="/register" className="text-primary hover:underline">
