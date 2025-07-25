@@ -310,7 +310,7 @@ console.log("Add to Cart ➜", product)
             <div className="space-y-4">
               <Button size="lg" className="w-full h-14 text-lg" disabled={!isAvailable} onClick={handleAddToCart}>
                 <ShoppingCart className="h-5 w-5 mr-3" />
-                {isAvailable ? `${t("addToCart")} - ${formatPrice(bestPrice * quantity)}` : "Out of Stock"}
+                {isAvailable ? `${t("addToCart")} - ${formatPrice(bestPrice * quantity)}  ` : "Out of Stock"}
               </Button>
 
               <Button variant="outline" size="lg" className="w-full h-12">

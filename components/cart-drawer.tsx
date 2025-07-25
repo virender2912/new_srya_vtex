@@ -80,7 +80,6 @@ export function CartDrawer() {
             <div className="flex-1 overflow-y-auto py-4">
               <div className="space-y-6">
                 {state.items.map((item) => (
-                   
                   <div key={`${item.productId}-${item.skuId}`} className="flex gap-4">
                     <div className="relative w-20 h-20 rounded-lg overflow-hidden border">
                       <Image
@@ -143,9 +142,9 @@ export function CartDrawer() {
 
                       <div className="flex items-center justify-between mt-2">
                         <div className="flex items-center gap-2">
-                          <span className="font-semibold text-sm">{formatPrice(item.price)}</span>
+                          <span className="font-semibold text-sm">{formatPrice(item.price)} </span>
                           {item.listPrice > item.price && (
-                            <span className="text-xs text-muted-foreground line-through">
+                            <span className="text-xs text-muted-foreground line-through"> 
                               {formatPrice(item.listPrice)}
                             </span>
                           )}
@@ -155,6 +154,7 @@ export function CartDrawer() {
                     </div>
                   </div>
                 ))}
+                
               </div>
             </div>
 

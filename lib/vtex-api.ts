@@ -409,11 +409,24 @@ export async function getProductsByCategory(categoryId: string, page = 1, pageSi
 
 // Format price helper - show as $1.20
 export function formatPrice(price: number) {
+  console.log('checkk price',price)
   return new Intl.NumberFormat("en-AE", {
     style: "currency",
     currency: "AED",
   }).format(price / 100)
+
+  
 }
+
+
+// export function formatPrice(price: number, currency: string = "SAR") {
+//   return new Intl.NumberFormat("en-SA", {
+//     style: "currency",
+//     currency,
+//     minimumFractionDigits: 2,
+//     maximumFractionDigits: 2
+//   }).format(price);
+// }
 
 // Get best available price from SKU
 export function getBestPrice(sku: VtexSku): number {

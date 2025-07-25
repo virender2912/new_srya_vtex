@@ -5,7 +5,8 @@ import Link from "next/link"
 import { Layout } from "@/components/layout"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 // import { GoogleLoginButton } from "@/components/GoogleLoginButton"
-import { Button } from "@/components/ui/button";
+// import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/auth-context"
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [token, setToken] = useState('')
@@ -13,6 +14,8 @@ export default function LoginPage() {
   const [step, setStep] = useState<'start' | 'validate'>('start')
   const [message, setMessage] = useState('')
 const router = useRouter()
+const { dispatch } = useAuth()
+const { login } = useAuth()
   const handleGoogleLogin = () => {
     const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}&redirect_uri=${process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI}&scope=profile email&prompt=select_account`
 
@@ -66,13 +69,24 @@ const handleValidate = async () => {
     console.log('✅ Response from /validate:', data)
 
     if (res.ok && data.customer) {
-      //setMessage('✅ Login successful!')
+      // Save user in localStorage
+      localStorage.setItem('vtex-user', JSON.stringify(data.customer))
 
-      // Save to localStorage (or ideally cookies for security)
-      localStorage.setItem('vtexUser', JSON.stringify(data.customer))
+      // ✅ Dispatch login success to update auth context
+      dispatch({
+        type: 'LOGIN_SUCCESS',
+        payload: {
+          id: data.customer.id || 'vtex-unknown',
+          email: data.customer.email,
+          firstName: data.customer.firstName || '',
+          lastName: data.customer.lastName || '',
+          phone: data.customer.phone,
+          isEmailVerified: true,
+        },
+      })
 
-      // Redirect to account page
-    router.push('/account')
+      // Redirect to account
+      router.push('/account')
     } else {
       setMessage(data.error || 'OTP validation failed')
     }

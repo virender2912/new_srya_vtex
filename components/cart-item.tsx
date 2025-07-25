@@ -11,8 +11,8 @@ interface CartItemProps {
   item: VtexProduct
   index: number
 }
-
 export function CartItem({ item, index }: CartItemProps) {
+  console.log("product details",item)
   const { updateQuantity, removeFromCart, loading } = useCart()
 
   const handleQuantityChange = async (newQuantity: number) => {
@@ -27,6 +27,7 @@ export function CartItem({ item, index }: CartItemProps) {
   }
 
   const formatPrice = (price: number) => {
+    console.log("cartItem price",price)
     return new Intl.NumberFormat("pt-BR", {
       style: "currency",
       currency: "BRL",
