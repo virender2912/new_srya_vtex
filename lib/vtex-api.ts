@@ -409,7 +409,6 @@ export async function getProductsByCategory(categoryId: string, page = 1, pageSi
 
 // Format price helper - show as $1.20
 export function formatPrice(price: number) {
-  console.log('checkk price',price)
   return new Intl.NumberFormat("en-AE", {
     style: "currency",
     currency: "AED",
@@ -421,7 +420,6 @@ export function formatPrice(price: number) {
 
 
 export function formatPricee(price: number) {
-  console.log('checkk price',price)
   return new Intl.NumberFormat("en-AE", {
     style: "currency",
     currency: "AED",

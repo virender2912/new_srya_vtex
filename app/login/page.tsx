@@ -4,10 +4,10 @@ import { useRouter } from 'next/navigation'
 import Link from "next/link"
 import { Layout } from "@/components/layout"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-// import { GoogleLoginButton } from "@/components/GoogleLoginButton"
-// import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import { useAuth } from "@/contexts/auth-context"
-export default function LoginPage() {
+// import { signIn } from "next-auth/react"
+export default function LoginPage() { 
   const [email, setEmail] = useState('')
   const [token, setToken] = useState('')
   const [otp, setOtp] = useState('')
@@ -16,6 +16,9 @@ export default function LoginPage() {
 const router = useRouter()
 const { dispatch } = useAuth()
 const { login } = useAuth()
+const handleFacebookLogin = () => {
+    window.location.href = '/api/login/facebook'
+  }
   const handleGoogleLogin = () => {
     const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}&redirect_uri=${process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI}&scope=profile email&prompt=select_account`
 
@@ -189,6 +192,15 @@ const handleValidate = async () => {
       </svg>
       Login with Google
     </button>
+
+
+
+<Button onClick={handleFacebookLogin}>
+        Continue with Facebook
+      </Button>
+    
+
+
   </div>
 </div>
 

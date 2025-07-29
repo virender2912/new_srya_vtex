@@ -58,7 +58,8 @@ export default function ProductsPage() {
 
         // Extract unique brands
         const brands = [...new Set(result.products.map((p: VtexProduct) => p.brand))]
-        setAvailableBrands(brands)
+        //setAvailableBrands(brands)
+        setAvailableBrands(brands as string[])
       } catch (error) {
         console.error("Failed to load products:", error)
         setProducts([])

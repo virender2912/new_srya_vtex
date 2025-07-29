@@ -65,12 +65,26 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [])
 
   // Refresh cart when page becomes visible (user returns from checkout)
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (!document.hidden && orderForm) {
-       refreshCart()
+
+
+  // useEffect(() => {
+  //   const handleVisibilityChange = () => {
+  //     if (!document.hidden && orderForm) {
+  //      refreshCart()
+  //     }
+  //   }
+
+
+useEffect(() => {
+  const handleVisibilityChange = async () => {
+    if (!document.hidden && orderForm) {
+      try {
+        await refreshCart()
+      } catch (err) {
+        console.error("Failed to refresh cart on tab visibility:", err)
       }
     }
+  }
 
     document.addEventListener("visibilitychange", handleVisibilityChange)
     return () => document.removeEventListener("visibilitychange", handleVisibilityChange)
