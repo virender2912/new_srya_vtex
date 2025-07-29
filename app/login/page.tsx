@@ -16,7 +16,7 @@ export default function LoginPage() {
 const router = useRouter()
 const { dispatch } = useAuth()
 const { login } = useAuth()
-const handleFacebookLogin = () => {
+ const handleFacebookLogin = () => {
     window.location.href = '/api/login/facebook'
   }
   const handleGoogleLogin = () => {
@@ -195,9 +195,12 @@ const handleValidate = async () => {
 
 
 
-<Button onClick={handleFacebookLogin}>
-        Continue with Facebook
-      </Button>
+ <button
+        onClick={handleFacebookLogin}
+        className="bg-blue-600 text-white px-4 py-2 rounded"
+      >
+        Login with Facebook
+      </button>
     
 
 

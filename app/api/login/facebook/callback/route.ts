@@ -1,33 +1,70 @@
-export async function GET(req: Request) {
+import { NextRequest, NextResponse } from 'next/server'
+import axios from 'axios'
+
+const FACEBOOK_APP_ID = process.env.FACEBOOK_APP_ID!
+const FACEBOOK_APP_SECRET = process.env.FACEBOOK_APP_SECRET!
+
+export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const code = searchParams.get('code')
-  const state = searchParams.get('state')
 
   if (!code) {
-    return new Response('No code returned from Facebook', { status: 400 })
+    return NextResponse.json({ error: 'Missing code' }, { status: 400 })
   }
 
-  const FACEBOOK_APP_ID = process.env.FACEBOOK_APP_ID!
-  const FACEBOOK_APP_SECRET = process.env.FACEBOOK_APP_SECRET!
-  const REDIRECT_URI = process.env.NODE_ENV === 'development'
-    ? 'http://localhost:3000/api/login/facebook/callback'
-    : 'https://new-srya-vtex.vercel.app/api/login/facebook/callback'
+  try {
+    // Step 1: Exchange code for access token
+    const tokenRes = await axios.get(
+      `https://graph.facebook.com/v17.0/oauth/access_token`,
+      {
+        params: {
+          client_id: FACEBOOK_APP_ID,
+          client_secret: FACEBOOK_APP_SECRET,
+          redirect_uri: 'http://localhost:3000/api/login/facebook/callback',
+          code,
+        },
+      }
+    )
 
-  // Exchange code for access token
-  const tokenRes = await fetch(`https://graph.facebook.com/v17.0/oauth/access_token?client_id=${FACEBOOK_APP_ID}&redirect_uri=${REDIRECT_URI}&client_secret=${FACEBOOK_APP_SECRET}&code=${code}`)
-  const tokenData = await tokenRes.json()
+    const accessToken = tokenRes.data.access_token
 
-  if (!tokenData.access_token) {
-    return new Response('Failed to get access token from Facebook', { status: 400 })
+    // Step 2: Fetch user info
+    const userRes = await axios.get(
+      `https://graph.facebook.com/me?fields=id,name,email,picture&access_token=${accessToken}`
+    )
+
+    const user = userRes.data
+
+    // Step 3: Save to VTEX Master Data (you implement this below)
+    await saveToVtex(user)
+
+    return NextResponse.redirect('http://localhost:3000/account') // or homepage
+  } catch (error: any) {
+    return NextResponse.json(
+      { error: 'Failed to get access token', details: error.response?.data || error.message },
+      { status: 500 }
+    )
   }
+}
 
-  // Get user info
-  const userRes = await fetch(`https://graph.facebook.com/me?fields=id,name,email&access_token=${tokenData.access_token}`)
-  const userData = await userRes.json()
+// Save Facebook user to VTEX Master Data
+async function saveToVtex(user: any) {
+  const VTEX_ACCOUNT = process.env.VTEX_ACCOUNT!
+  const VTEX_APP_KEY = process.env.VTEX_APP_KEY!
+  const VTEX_APP_TOKEN = process.env.VTEX_APP_TOKEN!
 
-  // 🔐 You can now use userData to log into VTEX or create a session
-  console.log('Facebook User:', userData)
-
-  // Redirect to homepage or account page
-  return Response.redirect('/account')
+  await fetch(`https://${VTEX_ACCOUNT}.vtexcommercestable.com.br/api/dataentities/CL/documents`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-VTEX-API-AppKey': VTEX_APP_KEY,
+      'X-VTEX-API-AppToken': VTEX_APP_TOKEN,
+    },
+    body: JSON.stringify({
+      email: user.email,
+      firstName: user.name.split(' ')[0],
+      lastName: user.name.split(' ')[1] || '',
+      facebookId: user.id,
+    }),
+  })
 }
