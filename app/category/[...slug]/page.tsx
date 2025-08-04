@@ -158,7 +158,7 @@ export default function CategoryPage() {
               <h3 className="font-semibold mb-2">Price Range</h3>
               <Slider value={priceRange} onValueChange={setPriceRange} min={0} max={1000} step={10} />
               <div className="text-sm text-muted-foreground mt-1">
-                ₹{priceRange[0]} - ₹{priceRange[1]}
+                AED{priceRange[0]} - AED{priceRange[1]}
               </div>
             </div>
 

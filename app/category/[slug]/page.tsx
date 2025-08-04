@@ -378,8 +378,8 @@ function FilterContent({
         <div className="space-y-4">
           <Slider value={priceRange} onValueChange={setPriceRange} max={1000} min={0} step={10} className="w-full" />
           <div className="flex items-center justify-between text-sm text-muted-foreground">
-            <span>$ {priceRange[0]}</span>
-            <span>$ {priceRange[1]}</span>
+            <span>AED {priceRange[0]}</span>
+            <span>AED {priceRange[1]}</span>
           </div>
         </div> 
       </div>
