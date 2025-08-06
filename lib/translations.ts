@@ -12,6 +12,17 @@ export const translations = {
     kids: "Kids",
     baby: "Baby",
     sports: "Sports",
+     "men/clothing": "Clothing",
+    "men/footwear": "Footwear",
+    "men/accessories": "Accessories",
+    "activewear": "Activewear",
+    "loungewear & sleepwear": "Loungewear & Sleepwear",
+    "innerwear": "Innerwear",
+    "occasion wear": "Occasion Wear",
+
+
+    "clothing": "Clothing",
+    "footwear": "Footwear",
 
     // Product related
     addToCart: "Add to Cart",
@@ -162,6 +173,19 @@ securcheckout: "100% secure checkout",
     kids: "أطفال",
     baby: "طفل",
     sports: "الرياضة",
+
+      "men/clothing": "الملابس",
+    "men/footwear": "الأحذية",
+    "men/accessories": "الإكسسوارات",
+    "activewear": "ملابس رياضية",
+    "loungewear & sleepwear": "ملابس النوم",
+    "innerwear": "ملابس داخلية",
+    "occasion wear": "ملابس المناسبات",
+
+
+    "clothing": "ملابس",
+    "footwear": "أحذية", 
+    // "activewear" : "ملابس رياضية",
 
     // Product related
     addToCart: "أضف إلى السلة",
