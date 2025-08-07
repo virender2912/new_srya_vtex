@@ -50,7 +50,7 @@ export function ProductCard({ product }: ProductCardProps) {
     e.preventDefault()
     e.stopPropagation()
     if (isAvailable) {
-      addItem(product.productId, firstSku.itemId, 1, "1")
+      addItem(product, firstSku, 1)
     }
   }
 

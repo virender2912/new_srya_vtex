@@ -137,27 +137,11 @@ console.log("Add to Cart ➜", product)
   const images = currentSku?.images || []
   const currentImage = images[selectedImageIndex]
 
-  // const handleAddToCart = () => {
-  //   if (isAvailable && quantity > 0) {
-  //     addItem(product, currentSku, quantity)
-  //   }
-  // }
-
-   const handleAddToCart = () => {
+  const handleAddToCart = () => {
     if (isAvailable && quantity > 0) {
-      // Pass product information for better cart display
-      const productInfo = {
-        name: product.productName,
-        brand: product.brand,
-        imageUrl: currentImage?.imageUrl,
-        price: bestPrice,
-        listPrice: listPrice,
-        linkText: product.linkText,
-      }
-      addItem(product.productId, currentSku.itemId, quantity, "1", productInfo)
+      addItem(product, currentSku, quantity)
     }
   }
-
 
   const handleWishlistToggle = () => {
     if (inWishlist) {
@@ -310,7 +294,7 @@ console.log("Add to Cart ➜", product)
             <div className="space-y-4">
               <Button size="lg" className="w-full h-14 text-lg" disabled={!isAvailable} onClick={handleAddToCart}>
                 <ShoppingCart className="h-5 w-5 mr-3" />
-                {isAvailable ? `${t("addToCart")} - ${formatPrice(bestPrice * quantity)}  ` : "Out of Stock"}
+                {isAvailable ? `${t("addToCart")} - ${formatPrice(bestPrice * quantity)}` : "Out of Stock"}
               </Button>
 
               <Button variant="outline" size="lg" className="w-full h-12">

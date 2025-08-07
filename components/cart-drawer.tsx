@@ -2,66 +2,25 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { Minus, Plus, Trash2, ShoppingBag, RefreshCw } from "lucide-react"
+import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { useCart } from "@/contexts/cart-context"
 import { formatPrice } from "@/lib/vtex-api"
-import { formatPricee } from "@/lib/vtex-api"
-import { useTranslation } from "@/hooks/use-translation"
-import { useLanguage } from "@/contexts/language-context"
-import { useEffect, useState } from "react"
-
+  import { useTranslation } from "@/hooks/use-translation"
+  import { useLanguage } from "@/contexts/language-context"
 export function CartDrawer() {
-  const { state, orderForm, isCartOpen, closeCart, removeItem, updateQuantity, proceedToCheckout, refreshCart } = useCart()
-  const { t } = useTranslation()
-  const { language } = useLanguage()
-  const [quantity, setQuantity] = useState(1)
-  const [isOpening, setIsOpening] = useState(false)
-
-  // Track isCartOpen changes
-  useEffect(() => {
-    if (isCartOpen) {
-      setIsOpening(true)
-      // Reset the opening flag after a short delay
-      setTimeout(() => setIsOpening(false), 100)
-    }
-  }, [isCartOpen])
-
-  // Handler for Secure Checkout
-  const handleSecureCheckout = async () => {
-    if (!Array.isArray(state.items) || state.items.length === 0) {
-      alert("Your cart is empty!")
-      return
-    }
-    
-    // Use the proper checkout flow from cart context
-    proceedToCheckout()
-  }
-
+  const { state, closeCart, removeItem, updateQuantity } = useCart()
+const { t } = useTranslation()
+ const { language } = useLanguage()
   return (
-    <Sheet open={isCartOpen} onOpenChange={(open) => {
-      if (!open && !isOpening) {
-        closeCart()
-      }
-    }}>
+    <Sheet open={state.isOpen} onOpenChange={closeCart}>
       <SheetContent className="flex flex-col w-full sm:max-w-lg">
         <SheetHeader>
-          <SheetTitle className="flex items-center justify-between text-xl">
-            <div className="flex items-center gap-2">
-              <ShoppingBag className="h-6 w-6" />
-              {t("shopping_cart")} ({state.totalItems})
-            </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={refreshCart}
-              className="h-8 w-8"
-              title="Refresh cart"
-            >
-              <RefreshCw className="h-4 w-4" />
-            </Button>
+          <SheetTitle className="flex items-center gap-2 text-xl">
+            <ShoppingBag className="h-6 w-6" />
+            {t("shopping_cart")} ({state.totalItems})
           </SheetTitle>
         </SheetHeader>
 
@@ -84,11 +43,15 @@ export function CartDrawer() {
                   <div key={`${item.productId}-${item.skuId}`} className="flex gap-4">
                     <div className="relative w-20 h-20 rounded-lg overflow-hidden border">
                       <Image
-                        src={item.imageUrl || "/images/women-banner.jpg"}
-                        alt={item.productName}
-                        fill
-                        className="object-cover"
-                      />
+  src={item.imageUrl || "/placeholder.svg?height=80&width=80"}
+  alt={
+    language === "ar"
+      ? item.productName_ar?.trim() || item.productName || "صورة المنتج"
+      : item.productName || "Product image"
+  }
+  fill
+  className="object-cover"
+/>
                     </div>
 
                     <div className="flex-1 min-w-0">
@@ -97,7 +60,7 @@ export function CartDrawer() {
                         onClick={closeCart}
                         className="block hover:text-primary transition-colors"
                       >
-                        <h4 className="font-medium text-sm line-clamp-2 mb-1">
+                         <h4 className="font-medium text-sm line-clamp-2 mb-1">
                           {language === "ar"
                             ? item.productName_ar?.trim() || item.productName
                             : item.productName}
@@ -126,9 +89,6 @@ export function CartDrawer() {
                           >
                             <Plus className="h-3 w-3" />
                           </Button>
-
-
-                            
                         </div>
 
                         <Button
@@ -143,31 +103,30 @@ export function CartDrawer() {
 
                       <div className="flex items-center justify-between mt-2">
                         <div className="flex items-center gap-2">
-                          <span className="font-semibold text-sm">{formatPricee(item.price)} </span>
+                          <span className="font-semibold text-sm">{formatPrice(item.price)}</span>
                           {item.listPrice > item.price && (
-                            <span className="text-xs text-muted-foreground line-through"> 
-                              {formatPricee(item.listPrice)}
+                            <span className="text-xs text-muted-foreground line-through">
+                              {formatPrice(item.listPrice)}
                             </span>
                           )}
                         </div>
-                        <span className="text-sm font-semibold">{formatPricee(item.price * item.quantity)}</span>
+                        <span className="text-sm font-semibold">{formatPrice(item.price * item.quantity)}</span>
                       </div>
                     </div>
                   </div>
                 ))}
-                
               </div>
             </div>
 
             <div className="border-t pt-6 space-y-4">
               <div className="flex items-center justify-between text-xl font-semibold">
                 <span>{t("total")}</span>
-                <span>{formatPricee(state.totalPrice)}</span>
+                <span>{formatPrice(state.totalPrice)}</span>
               </div>
 
               <div className="space-y-3">
-                <Button className="w-full" size="lg" onClick={handleSecureCheckout}>
-                  {t("securecheckout")}
+                <Button className="w-full" size="lg" asChild onClick={closeCart}>
+                  <Link href="/checkout">{t("securecheckout")}</Link>
                 </Button>
                 <Button variant="outline" className="w-full" asChild onClick={closeCart}>
                   <Link href="/cart">{t("full_cart")}</Link>
