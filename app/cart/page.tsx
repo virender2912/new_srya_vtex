@@ -84,10 +84,12 @@ const { language } = useLanguage()
     : item.productName}
 </h3>
                             {item.skuName !== item.productName && (
-                              <p className="text-sm text-muted-foreground mt-1">{item.skuName}</p>
+                               <p className="text-sm text-muted-foreground mt-1">
+                                {/* {item.skuName} */}
+                                </p>
                             )}
                           </Link>
-                          <p className="text-sm text-muted-foreground mt-1">{item.brand}</p>
+                          <p className="text-sm text-muted-foreground mt-1">{t(item.brand)}</p>
                         </div>
 
                         <Button
