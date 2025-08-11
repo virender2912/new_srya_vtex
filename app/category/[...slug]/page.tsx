@@ -11,6 +11,8 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 import { Grid, List } from "lucide-react"
+import { useTranslation } from "@/hooks/use-translation"
+
 
 interface Category {
   id: string
@@ -24,7 +26,7 @@ export default function CategoryPage() {
   const params = useParams()
   const slugParam = params.slug as string[] | string
   const fullSlug = Array.isArray(slugParam) ? slugParam.join("/") : slugParam
-
+const { t } = useTranslation()
   const [category, setCategory] = useState<Category | null>(null)
   const [products, setProducts] = useState<any[]>([])
   const [filteredProducts, setFilteredProducts] = useState<any[]>([])
@@ -125,13 +127,16 @@ export default function CategoryPage() {
   return (
     <Layout>
       <div className="container py-8">
-        <h1 className="text-3xl font-bold mb-4">{category?.name || "Category"}</h1>
+        <h1 className="text-3xl font-bold mb-4">
+          {/* {category?.name || "Category"} */}
+           {category ? t(category.name) : t("Category")}
+          </h1>
 
         {/* Filters */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
           <div className="space-y-6">
             <div>
-              <h3 className="font-semibold mb-2">Search</h3>
+              <h3 className="font-semibold mb-2">{t("search")}</h3>
               <Input
                 placeholder="Search products..."
                 value={searchQuery}
@@ -140,22 +145,22 @@ export default function CategoryPage() {
             </div>
 
             <div>
-              <h3 className="font-semibold mb-2">Sort By</h3>
+              <h3 className="font-semibold mb-2">{t("sortBy")}</h3>
               <Select value={sortBy} onValueChange={setSortBy}>
                 <SelectTrigger>
                   <SelectValue placeholder="Sort by" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="relevance">Relevance</SelectItem>
-                  <SelectItem value="price-low">Price: Low to High</SelectItem>
-                  <SelectItem value="price-high">Price: High to Low</SelectItem>
-                  <SelectItem value="name">Name</SelectItem>
+                  <SelectItem value="relevance">{t("relevance")}</SelectItem>
+                             <SelectItem value="price-low">{t("price")}: {t("lowToHigh")}</SelectItem>
+                             <SelectItem value="price-high">{t("price")}: {t("highToLow")}</SelectItem>
+                             <SelectItem value="name">{t("name")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div>
-              <h3 className="font-semibold mb-2">Price Range</h3>
+              <h3 className="font-semibold mb-2">{t("priceRange")}</h3>
               <Slider value={priceRange} onValueChange={setPriceRange} min={0} max={1000} step={10} />
               <div className="text-sm text-muted-foreground mt-1">
                 AED{priceRange[0]} - AED{priceRange[1]}
@@ -164,7 +169,7 @@ export default function CategoryPage() {
 
             {availableBrands.length > 0 && (
               <div>
-                <h3 className="font-semibold mb-2">Brands</h3>
+                <h3 className="font-semibold mb-2">{t("brand")}</h3>
                 <div className="space-y-2">
                   {availableBrands.map((brand) => (
                     <div key={brand} className="flex items-center space-x-2">
@@ -173,7 +178,7 @@ export default function CategoryPage() {
                         checked={selectedBrands.includes(brand)}
                         onCheckedChange={(checked) => handleBrandChange(brand, checked as boolean)}
                       />
-                      <Label htmlFor={brand}>{brand}</Label>
+                      <Label htmlFor={brand}>{t(brand)}</Label>
                     </div>
                   ))}
                 </div>
@@ -181,7 +186,7 @@ export default function CategoryPage() {
             )}
 
             <Button variant="outline" onClick={clearFilters}>
-              Clear Filters
+                {t("clearFilters")}
             </Button>
           </div>
 

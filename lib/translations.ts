@@ -23,7 +23,8 @@ export const translations = {
 
     "clothing": "Clothing",
     "footwear": "Footwear",
-
+    Men : "Men",
+WOMEN: "WOMEN",
     // Product related
     addToCart: "Add to Cart",
     buyNow: "Buy Now",
@@ -61,6 +62,8 @@ export const translations = {
     accessories: "Accessories",
     shoes: "Shoes",
     sale: "Sale",
+      filters: "filters",
+    clearFilters: "Clear Filters",
 
     announcement_bar: "Free shipping on orders over $75 | New arrivals weekly",
     cartdrawer_text: "Add some beautiful pieces to get started!",
@@ -98,7 +101,9 @@ export const translations = {
     evening_elegance: "Evening Elegance",
     brand: "Brand",
     securecheckout: "Secure Checkout",
-
+lowToHigh: "low to High",
+highToLow: "highToLow",
+"Occasion Wear": "Occasion Wear",
 
 
 // en
@@ -158,9 +163,18 @@ easy_return: "Easy Returns",
 returnpolicy: "30-day return policy",
 securpayment: "Secure Payment",
 securcheckout: "100% secure checkout",
-
+of :"of",
+sortBy: "Sort By",
+priceRange : "Price Range",
   },
   ar: {
+       Men : "الرجال",
+    WOMEN: "نحيف",
+    KIDS: "أطفال",
+    BABY: "طفل",
+    SPORTS: "الرياضة",
+    SYRA: "سيرا",
+    Clothing: "ملابس",
     // Navigation
     home: "الرئيسية",
     Nike: "نايك",
@@ -181,6 +195,17 @@ securcheckout: "100% secure checkout",
     "loungewear & sleepwear": "ملابس النوم",
     "innerwear": "ملابس داخلية",
     "occasion wear": "ملابس المناسبات",
+    filters: "المرشحات",
+lowToHigh: "منخفض إلى مرتفع",
+highToLow: "عالية إلى منخفضة",
+relevance: "الملاءمة",
+name: "اسم",
+Footwear: "الأحذية",
+Accessories: "مُكَمِّلات",
+Activewear: "ملابس رياضية",
+Innerwear: "الملابس الداخلية",
+"Occasion Wear": "ملابس المناسبات",
+"Loungewear & Sleepwear": "ملابس النوم والملابس الداخلية",
 
 
     "clothing": "ملابس",
@@ -265,7 +290,10 @@ securcheckout: "100% secure checkout",
     footer_lower_text: "© ٢٠٢٥ سيرا. جميع الحقوق محفوظة. | سياسة الخصوصية | شروط الخدمة",
     details: "تفاصيل",
     care_guide: "دليل الرعاية",
-
+clearFilters: "مرشحات واضحة",
+of :"ل",
+sortBy: "فرز حسب",
+priceRange: "نطاق السعر",
 
 
     // ar

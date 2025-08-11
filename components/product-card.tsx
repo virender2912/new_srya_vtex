@@ -45,7 +45,7 @@ export function ProductCard({ product }: ProductCardProps) {
   // ✅ Arabic title fallback logic
   const arabicTitle = Array.isArray(product.Arabic_title) ? product.Arabic_title[0] : null
   const title = language === "ar" && arabicTitle ? arabicTitle : product.productName
-
+  const { t } = useTranslation()
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
@@ -138,7 +138,7 @@ export function ProductCard({ product }: ProductCardProps) {
         <div className="space-y-3">
           <div>
             <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium mb-1">
-              {product.brand}
+              {t(product.brand)}
             </p>
             <Link href={`/product/${cleanLinkText}`}>
               <h3 className="font-medium text-lg line-clamp-2 hover:text-primary transition-colors leading-tight">

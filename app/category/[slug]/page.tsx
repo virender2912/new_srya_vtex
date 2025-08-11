@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useEffect, useState } from "react"
 import { useParams } from "next/navigation"
 import { Filter, Grid, List, ArrowLeft } from "lucide-react"
@@ -17,6 +16,7 @@ import { Label } from "@/components/ui/label"
 import { Layout } from "@/components/layout"
 import { ProductCard } from "@/components/product-card"
 import type { VtexProduct } from "@/lib/vtex-api"
+  import { useTranslation } from "@/hooks/use-translation" // custom translation hook
 
 interface CategoryData {
   id: string
@@ -29,6 +29,7 @@ interface CategoryData {
 export default function CategoryPage() {
   const params = useParams()
   const slug = params.slug as string
+  const { t } = useTranslation()
 
   const [category, setCategory] = useState<CategoryData | null>(null)
   const [products, setProducts] = useState<VtexProduct[]>([])
@@ -41,56 +42,49 @@ export default function CategoryPage() {
   const [selectedBrands, setSelectedBrands] = useState<string[]>([])
   const [availableBrands, setAvailableBrands] = useState<string[]>([])
 
-useEffect(() => {
-  const loadCategoryData = async () => {
-    setLoading(true)
-    try {
-      // Fetch all categories
-      const categoryResponse = await fetch("/api/categories?level=3")
-      if (!categoryResponse.ok) throw new Error("Failed to fetch categories")
+  useEffect(() => {
+    const loadCategoryData = async () => {
+      setLoading(true)
+      try {
+        const categoryResponse = await fetch("/api/categories?level=3")
+        if (!categoryResponse.ok) throw new Error("Failed to fetch categories")
 
-      const categories: CategoryData[] = await categoryResponse.json()
-      const matchedCategory = categories.find((cat) => cat.slug === slug)
+        const categories: CategoryData[] = await categoryResponse.json()
+        const matchedCategory = categories.find((cat) => cat.slug === slug)
 
-      if (!matchedCategory) {
-        setCategory(null)
-        setProducts([])
-        setFilteredProducts([])
-        return
+        if (!matchedCategory) {
+          setCategory(null)
+          setProducts([])
+          setFilteredProducts([])
+          return
+        }
+
+        setCategory(matchedCategory)
+
+        const productsResponse = await fetch(`/api/products?category=${matchedCategory.id}&count=1000`)
+        if (!productsResponse.ok) throw new Error("Failed to fetch products")
+
+        const result = await productsResponse.json()
+        setProducts(result.products)
+        setFilteredProducts(result.products)
+
+        const brands = [...new Set(result.products.map((p: VtexProduct) => p.brand))] as string[]
+        setAvailableBrands(brands)
+      } catch (error) {
+        console.error("Error loading category/products:", error)
+      } finally {
+        setLoading(false)
       }
-
-      setCategory(matchedCategory)
-
-      // Now fetch products using category ID
-      const productsResponse = await fetch(`/api/products?category=${matchedCategory.id}&count=1000`)
-      if (!productsResponse.ok) throw new Error("Failed to fetch products")
-
-      const result = await productsResponse.json()
-      setProducts(result.products)
-      setFilteredProducts(result.products)
-
-      // Extract brands
-      const brands = [...new Set(result.products.map((p: VtexProduct) => p.brand))] as string[]
-      setAvailableBrands(brands)
-
-    } catch (error) {
-      console.error("Error loading category/products:", error)
-    } finally {
-      setLoading(false)
     }
-  }
 
-  if (slug) {
-    loadCategoryData()
-  }
-}, [slug])
+    if (slug) {
+      loadCategoryData()
+    }
+  }, [slug])
 
-
-  // Filter products based on search, price, and brands
   useEffect(() => {
     let filtered = products
 
-    // Search filter
     if (searchQuery) {
       filtered = filtered.filter(
         (product) =>
@@ -99,19 +93,16 @@ useEffect(() => {
       )
     }
 
-    // Brand filter
     if (selectedBrands.length > 0) {
       filtered = filtered.filter((product) => selectedBrands.includes(product.brand))
     }
 
-    // Price filter (simplified - using first SKU price)
     filtered = filtered.filter((product) => {
       const price = product.items[0]?.sellers[0]?.commertialOffer?.Price || 0
       const priceInReais = price / 100
       return priceInReais >= priceRange[0] && priceInReais <= priceRange[1]
     })
 
-    // Sort products
     switch (sortBy) {
       case "price-low":
         filtered.sort((a, b) => {
@@ -130,9 +121,6 @@ useEffect(() => {
       case "name":
         filtered.sort((a, b) => a.productName.localeCompare(b.productName))
         break
-      default:
-        // Keep original order for relevance
-        break
     }
 
     setFilteredProducts(filtered)
@@ -148,7 +136,6 @@ useEffect(() => {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
-    // Search is handled by useEffect
   }
 
   const clearFilters = () => {
@@ -162,21 +149,7 @@ useEffect(() => {
     return (
       <Layout>
         <div className="container py-8">
-          <div className="animate-pulse space-y-6">
-            <div className="h-8 bg-muted rounded w-1/3" />
-            <div className="h-4 bg-muted rounded w-2/3" />
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className="space-y-4">
-                  <div className="aspect-square bg-muted rounded" />
-                  <div className="space-y-2">
-                    <div className="h-4 bg-muted rounded" />
-                    <div className="h-3 bg-muted rounded w-2/3" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <p>{t("loading")}</p>
         </div>
       </Layout>
     )
@@ -185,17 +158,15 @@ useEffect(() => {
   if (!category) {
     return (
       <Layout>
-        <div className="container py-8">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold mb-4">Category Not Found</h1>
-            <p className="text-muted-foreground mb-8">The category you're looking for doesn't exist.</p>
-            <Button asChild>
-              <Link href="/categories">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Browse Categories
-              </Link>
-            </Button>
-          </div>
+        <div className="container py-8 text-center">
+          <h1 className="text-2xl font-bold mb-4">{t("error")}</h1>
+          <p className="text-muted-foreground mb-8">{t("noResults")}</p>
+          <Button asChild>
+            <Link href="/categories">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              {t("categories")}
+            </Link>
+          </Button>
         </div>
       </Layout>
     )
@@ -204,43 +175,35 @@ useEffect(() => {
   return (
     <Layout>
       <div className="container py-8">
-        {/* Breadcrumb */}
         <nav className="flex items-center space-x-2 text-sm text-muted-foreground mb-6 breadcrumb">
-          <Link href="/" className="hover:text-foreground">
-            Home
-          </Link>
+          <Link href="/" className="hover:text-foreground">{t("home")}</Link>
           <span>/</span>
-          <Link href="/categories" className="hover:text-foreground">
-            Categories
-          </Link>
+          <Link href="/categories" className="hover:text-foreground">{t("categories")}</Link>
           <span>/</span>
           <span className="text-foreground">{category.name}</span>
         </nav>
 
-        {/* Header */}
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold mb-4">{category.name}</h1>
+          <h1 className="text-3xl font-bold mb-4">{t(category.name)}</h1>
           <p className="text-muted-foreground mb-4">{category.description}</p>
           <p className="text-sm text-muted-foreground">
-            {filteredProducts.length} of {products.length} products
+            {filteredProducts.length} {t("of")} {products.length} {t("products")}
           </p>
         </div>
 
-        {/* Filters and Products */}
         <div className="flex flex-col lg:flex-row gap-6">
-          {/* Sidebar Filters */}
           <div className="lg:w-64 space-y-6">
-            {/* Mobile Filter Toggle */}
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="outline" className="lg:hidden w-full">
                   <Filter className="h-4 w-4 mr-2" />
-                  Filters
+                  {t("filters")}
                 </Button>
               </SheetTrigger>
               <SheetContent side="left">
                 <div className="space-y-6 pt-6">
                   <FilterContent
+                    t={t}
                     searchQuery={searchQuery}
                     setSearchQuery={setSearchQuery}
                     handleSearch={handleSearch}
@@ -257,9 +220,9 @@ useEffect(() => {
               </SheetContent>
             </Sheet>
 
-            {/* Desktop Filters */}
             <div className="hidden lg:block space-y-6">
               <FilterContent
+                t={t}
                 searchQuery={searchQuery}
                 setSearchQuery={setSearchQuery}
                 handleSearch={handleSearch}
@@ -275,41 +238,28 @@ useEffect(() => {
             </div>
           </div>
 
-          {/* Products Grid */}
-          <div className="flex-1 adding-padding">
-            {/* View Toggle */}
+          <div className="flex-1">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center space-x-2">
-                <Button
-                  variant={viewMode === "grid" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setViewMode("grid")}
-                >
+                <Button variant={viewMode === "grid" ? "default" : "outline"} size="sm" onClick={() => setViewMode("grid")}>
                   <Grid className="h-4 w-4" />
                 </Button>
-                <Button
-                  variant={viewMode === "list" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setViewMode("list")}
-                >
+                <Button variant={viewMode === "list" ? "default" : "outline"} size="sm" onClick={() => setViewMode("list")}>
                   <List className="h-4 w-4" />
                 </Button>
               </div>
             </div>
 
-            {/* Products */}
             {filteredProducts.length > 0 ? (
-              <div
-                className={`grid gap-6 ${viewMode === "grid" ? "grid-cols-2 sm:grid-cols-2 lg:grid-cols-3" : "grid-cols-1 listview"}`}
-              >
+              <div className={`grid gap-6 ${viewMode === "grid" ? "grid-cols-2 sm:grid-cols-2 lg:grid-cols-3" : "grid-cols-1 listview"}`}>
                 {filteredProducts.map((product) => (
                   <ProductCard key={product.productId} product={product} />
                 ))}
               </div>
             ) : (
               <div className="text-center py-12">
-                <p className="text-lg text-muted-foreground mb-4">No products found</p>
-                <Button onClick={clearFilters}>Clear Filters</Button>
+                <p className="text-lg text-muted-foreground mb-4">{t("noResults")}</p>
+                <Button onClick={clearFilters}>{t("clearFilters")}</Button>
               </div>
             )}
           </div>
@@ -319,8 +269,8 @@ useEffect(() => {
   )
 }
 
-// Filter content component to avoid duplication
 function FilterContent({
+  t,
   searchQuery,
   setSearchQuery,
   handleSearch,
@@ -333,6 +283,7 @@ function FilterContent({
   handleBrandChange,
   clearFilters,
 }: {
+  t: (key: string) => string
   searchQuery: string
   setSearchQuery: (query: string) => void
   handleSearch: (e: React.FormEvent) => void
@@ -348,45 +299,37 @@ function FilterContent({
   return (
     <>
       <div>
-        <h3 className="font-semibold mb-3">Search</h3>
+        <h3 className="font-semibold mb-3">{t("search")}</h3>
         <form onSubmit={handleSearch}>
-          <Input
-            placeholder="Search in category..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+          <Input placeholder={t("search")} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
         </form>
       </div>
 
       <div>
-        <h3 className="font-semibold mb-3">Sort By</h3>
+        <h3 className="font-semibold mb-3">{t("sortBy")}</h3>
         <Select value={sortBy} onValueChange={setSortBy}>
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
+          <SelectTrigger><SelectValue /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="relevance">Relevance</SelectItem>
-            <SelectItem value="price-low">Price: Low to High</SelectItem>
-            <SelectItem value="price-high">Price: High to Low</SelectItem>
-            <SelectItem value="name">Name</SelectItem>
+            <SelectItem value="relevance">{t("relevance")}</SelectItem>
+            <SelectItem value="price-low">{t("price")}: {t("lowToHigh")}</SelectItem>
+            <SelectItem value="price-high">{t("price")}: {t("highToLow")}</SelectItem>
+            <SelectItem value="name">{t("name")}</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       <div>
-        <h3 className="font-semibold mb-3">Price Range</h3>
-        <div className="space-y-4">
-          <Slider value={priceRange} onValueChange={setPriceRange} max={1000} min={0} step={10} className="w-full" />
-          <div className="flex items-center justify-between text-sm text-muted-foreground">
-            <span>AED {priceRange[0]}</span>
-            <span>AED {priceRange[1]}</span>
-          </div>
-        </div> 
+        <h3 className="font-semibold mb-3">{t("priceRange")}</h3>
+        <Slider value={priceRange} onValueChange={setPriceRange} max={1000} min={0} step={10} className="w-full" />
+        <div className="flex items-center justify-between text-sm text-muted-foreground">
+          <span>AED {priceRange[0]}</span>
+          <span>AED {priceRange[1]}</span>
+        </div>
       </div>
 
       {availableBrands.length > 0 && (
         <div>
-          <h3 className="font-semibold mb-3">Brands</h3>
+          <h3 className="font-semibold mb-3">{t("brand")}</h3>
           <div className="space-y-2 max-h-48 overflow-y-auto">
             {availableBrands.map((brand) => (
               <div key={brand} className="flex items-center space-x-2">
@@ -395,9 +338,7 @@ function FilterContent({
                   checked={selectedBrands.includes(brand)}
                   onCheckedChange={(checked) => handleBrandChange(brand, checked as boolean)}
                 />
-                <Label htmlFor={brand} className="text-sm">
-                  {brand}
-                </Label>
+                <Label htmlFor={brand} className="text-sm">{t(brand)}</Label>
               </div>
             ))}
           </div>
@@ -405,7 +346,7 @@ function FilterContent({
       )}
 
       <Button variant="outline" onClick={clearFilters} className="w-full">
-        Clear All Filters
+        {t("clearFilters")}
       </Button>
     </>
   )
