@@ -15,8 +15,9 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Layout } from "@/components/layout"
 import { useAuth } from "@/contexts/auth-context"
-
+import { useTranslation } from "@/hooks/use-translation"
 export default function RegisterPage() {
+    const { t } = useTranslation()
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -82,8 +83,8 @@ export default function RegisterPage() {
         <div className="max-w-md mx-auto">
           <Card>
             <CardHeader className="text-center">
-              <CardTitle className="text-2xl">Create Account</CardTitle>
-              <CardDescription>Join us and start shopping today</CardDescription>
+              <CardTitle className="text-2xl">{t('Create Account')}</CardTitle>
+              <CardDescription>{t('Join us and start shopping today')}</CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
@@ -95,24 +96,24 @@ export default function RegisterPage() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="firstName">First Name *</Label>
+                    <Label htmlFor="firstName">{t('First Name')} *</Label>
                     <Input
                       id="firstName"
                       name="firstName"
                       type="text"
-                      placeholder="John"
+                      // placeholder="John"
                       value={formData.firstName}
                       onChange={handleInputChange}
                       required
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="lastName">Last Name *</Label>
+                    <Label htmlFor="lastName">{t('Last Name')} *</Label>
                     <Input
                       id="lastName"
                       name="lastName"
                       type="text"
-                      placeholder="Doe"
+                      // placeholder="Doe"
                       value={formData.lastName}
                       onChange={handleInputChange}
                       required
@@ -121,12 +122,12 @@ export default function RegisterPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email *</Label>
+                  <Label htmlFor="email">{t('Email')} *</Label>
                   <Input
                     id="email"
                     name="email"
                     type="email"
-                    placeholder="john@example.com"
+                    // placeholder="john@example.com"
                     value={formData.email}
                     onChange={handleInputChange}
                     required
@@ -134,25 +135,25 @@ export default function RegisterPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="phone">Phone (Optional)</Label>
+                  <Label htmlFor="phone">{t('Phone (Optional)')}</Label>
                   <Input
                     id="phone"
                     name="phone"
                     type="tel"
-                    placeholder="+1 (555) 123-4567"
+                    // placeholder="+1 (555) 123-4567"
                     value={formData.phone}
                     onChange={handleInputChange}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="password">Password *</Label>
+                  <Label htmlFor="password">{t('Password')} *</Label>
                   <div className="relative">
                     <Input
                       id="password"
                       name="password"
                       type={showPassword ? "text" : "password"}
-                      placeholder="Create a password"
+                      // placeholder="Create a password"
                       value={formData.password}
                       onChange={handleInputChange}
                       required
@@ -170,13 +171,13 @@ export default function RegisterPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Confirm Password *</Label>
+                  <Label htmlFor="confirmPassword">{t('Confirm Password')} *</Label>
                   <div className="relative">
                     <Input
                       id="confirmPassword"
                       name="confirmPassword"
                       type={showConfirmPassword ? "text" : "password"}
-                      placeholder="Confirm your password"
+                      // placeholder="Confirm your password"
                       value={formData.confirmPassword}
                       onChange={handleInputChange}
                       required
@@ -200,13 +201,13 @@ export default function RegisterPage() {
                     onCheckedChange={(checked) => setAcceptTerms(checked === true)} 
                   />
                   <Label htmlFor="terms" className="text-sm">
-                    I agree to the{" "}
+                    {t('I agree to the')}{" "}
                     <Link href="/terms" className="text-primary hover:underline">
-                      Terms of Service
+                      {t('Terms of Service')}
                     </Link>{" "}
-                    and{" "}
+                    {t('and')}{" "}
                     <Link href="/privacy" className="text-primary hover:underline">
-                      Privacy Policy
+                      {t('Privacy Policy')}
                     </Link>
                   </Label>
                 </div>
@@ -215,19 +216,19 @@ export default function RegisterPage() {
                   {state.isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Creating account...
+                      {t('Creating account...')}
                     </>
                   ) : (
-                    "Create Account"
+                    t('Create Account')
                   )}
                 </Button>
               </form>
 
               <div className="mt-6 text-center">
                 <p className="text-sm text-muted-foreground">
-                  Already have an account?{" "}
+                  {t('Already have an account?')}{" "}
                   <Link href="/login" className="text-primary hover:underline">
-                    Sign in
+                    {t('Sign in')}
                   </Link>
                 </p>
               </div>

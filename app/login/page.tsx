@@ -6,8 +6,10 @@ import { Layout } from "@/components/layout"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from '@/components/ui/button';
 import { useAuth } from "@/contexts/auth-context"
+import { useTranslation } from "@/hooks/use-translation"
 // import { signIn } from "next-auth/react"
 export default function LoginPage() { 
+  const { t } = useTranslation()
   const [email, setEmail] = useState('')
   const [token, setToken] = useState('')
   const [otp, setOtp] = useState('')
@@ -104,14 +106,14 @@ const handleValidate = async () => {
     <div style={{ maxWidth: 400, margin: 'auto', padding: 20 }}>
        <Card>
       <CardHeader className="text-center">
-       <CardTitle className="text-2xl">Welcome Back</CardTitle>
-              <CardDescription>Sign in to your account to continue shopping</CardDescription>
+       <CardTitle className="text-2xl">{t('Welcome Back')}</CardTitle>
+              <CardDescription>{t('Sign in to your account to continue shopping')}</CardDescription>
   </CardHeader>
   <CardContent>
     <div className="space-y-2 emailinput">
       <input
         type="email"
-        placeholder="Enter your email"
+        placeholder={t("Enter your email")}
         value={email}
         disabled={step !== 'start'}
         onChange={(e) => setEmail(e.target.value)}
@@ -120,7 +122,7 @@ const handleValidate = async () => {
 </div>
       {step === 'start' && (
         <button className="loginbtn right-0 top-0 h-full px-3 py-2" onClick={handleStartAndSend} style={{ width: '100%', padding: '10px' }}>
-          Login
+          {t('Login')}
         </button>
       )}
 
@@ -129,13 +131,13 @@ const handleValidate = async () => {
         <div className="space-y-2 emailinput">
           <input
             type="text"
-            placeholder="Enter OTP"
+            placeholder={t("Enter OTP")}
             value={otp}
             onChange={(e) => setOtp(e.target.value)}
             style={{ width: '100%', padding: '8px', margin: '10px 0' }}
           />
           <button className="loginbtn right-0 top-0 h-full px-3 py-2" onClick={handleValidate} style={{ width: '100%', padding: '10px' }}>
-            Validate OTP
+            {t('Validate OTP')}
           </button>
           </div>
         </>
@@ -149,9 +151,9 @@ const handleValidate = async () => {
                   Forgot your password?
                 </Link> */}
                 <p className="text-sm text-muted-foreground">
-                  Don't have an account?{" "}
+                  {t("Don't have an account?")}{" "}
                   <Link href="/register" className="text-primary hover:underline">
-                    Sign up
+                    {t('Sign up')}
                   </Link>
                 </p>
               </div>
@@ -190,7 +192,7 @@ const handleValidate = async () => {
           fill="#EA4335"
         />
       </svg>
-      Login with Google
+      {t('Login with Google')}
     </button>
 
 

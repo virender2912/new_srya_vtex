@@ -148,7 +148,7 @@ const { language } = useLanguage()
             <div className="flex justify-end">
               <Button variant="outline" onClick={clearCart} className="text-destructive hover:text-destructive">
                 <Trash2 className="h-4 w-4 mr-2" />
-                Clear Cart
+                {t('Clear Cart')}
               </Button>
             </div>
           </div>
@@ -183,8 +183,8 @@ const { language } = useLanguage()
                 </div>
 
                 <div className="space-y-2">
-                  <Button className="w-full" size="lg">
-                    {t("proceed_checkout")}
+                 <Button variant="outline" className="w-full" asChild>
+                    <Link href="/checkout">{t("proceed_checkout")}</Link>
                   </Button>
                   <Button variant="outline" className="w-full" asChild>
                     <Link href="/products">{t("continue_shopping")}</Link>

@@ -180,7 +180,7 @@ export default function CategoryPage() {
           <span>/</span>
           <Link href="/categories" className="hover:text-foreground">{t("categories")}</Link>
           <span>/</span>
-          <span className="text-foreground">{category.name}</span>
+          <span className="text-foreground">{t(category.name)}</span>
         </nav>
 
         <div className="mb-8 text-center">

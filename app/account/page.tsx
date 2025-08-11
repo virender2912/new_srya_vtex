@@ -16,8 +16,9 @@ import { Layout } from "@/components/layout"
 import { useAuth } from "@/contexts/auth-context"
 import { useCart } from "@/contexts/cart-context"
 import { useWishlist } from "@/contexts/wishlist-context"
-
+import { useTranslation } from "@/hooks/use-translation"
 export default function AccountPage() {
+    const { t } = useTranslation()
   const { state: authState, logout } = useAuth()
   const { state: cartState } = useCart()
   const { state: wishlistState } = useWishlist()
@@ -129,12 +130,12 @@ if (!user) {
           <div>
             <h1 className="text-3xl font-bold">My Account</h1>
       <p className="text-muted-foreground">
-  Welcome back, {user.firstName} {user.lastName}
+  {t('Welcome Back')}, {user.firstName} {user.lastName}
 </p>
           </div>
           <Button variant="outline" onClick={handleLogout}>
             <LogOut className="h-4 w-4 mr-2" />
-            Logout
+            {t('Logout')}
           </Button>
         </div>
 
@@ -148,7 +149,7 @@ if (!user) {
                 </div>
                 <div>
                   <p className="text-2xl font-bold">0</p>
-                  <p className="text-sm text-muted-foreground">Orders</p>
+                  <p className="text-sm text-muted-foreground">{t('Orders')}</p>
                 </div>
               </div>
             </CardContent>
@@ -162,7 +163,7 @@ if (!user) {
                 </div>
                 <div>
                   <p className="text-2xl font-bold">{wishlistState.totalItems}</p>
-                  <p className="text-sm text-muted-foreground">Wishlist Items</p>
+                  <p className="text-sm text-muted-foreground">{t('Wishlist Items')}</p>
                 </div>
               </div>
             </CardContent>
@@ -176,7 +177,7 @@ if (!user) {
                 </div>
                 <div>
                   <p className="text-2xl font-bold">{cartState.totalItems}</p>
-                  <p className="text-sm text-muted-foreground">Cart Items</p>
+                  <p className="text-sm text-muted-foreground">{t('Cart Items')}</p>
                 </div>
               </div>
             </CardContent>
@@ -186,10 +187,10 @@ if (!user) {
         {/* Account Tabs */}
         <Tabs defaultValue="profile" className="space-y-6">
           <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="profile">Profile</TabsTrigger>
-            <TabsTrigger value="orders">Orders</TabsTrigger>
-            <TabsTrigger value="wishlist">Wishlist</TabsTrigger>
-            <TabsTrigger value="settings">Settings</TabsTrigger>
+            <TabsTrigger value="profile">{t('Profile')}</TabsTrigger>
+            <TabsTrigger value="orders">{t('Orders')}</TabsTrigger>
+            <TabsTrigger value="wishlist">{t('Wishlist')}</TabsTrigger>
+            <TabsTrigger value="settings">{t('Settings')}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="profile">
@@ -197,8 +198,8 @@ if (!user) {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle>Profile Information</CardTitle>
-                    <CardDescription>Manage your personal information</CardDescription>
+                    <CardTitle>{t('Profile Information')}</CardTitle>
+                    <CardDescription>{t('Manage your personal information')}</CardDescription>
                   </div>
                   <Button variant="outline" size="sm" onClick={() => setIsEditing(!isEditing)}>
                     <Edit className="h-4 w-4 mr-2" />
@@ -209,7 +210,7 @@ if (!user) {
               <CardContent className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="firstName">First Name</Label>
+                    <Label htmlFor="firstName">{t('First Name')}</Label>
                     <Input
                       id="firstName"
                       name="firstName"
@@ -219,7 +220,7 @@ if (!user) {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="lastName">Last Name</Label>
+                    <Label htmlFor="lastName">{t('Last Name')}</Label>
                     <Input
                       id="lastName"
                       name="lastName"
@@ -231,7 +232,7 @@ if (!user) {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">{t('Email')}</Label>
                   <Input
                     id="email"
                     name="email"
@@ -243,7 +244,7 @@ if (!user) {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="phone">Phone</Label>
+                  <Label htmlFor="phone">{t('Phone')}</Label>
                   <Input
                     id="phone"
                     name="phone"
@@ -256,9 +257,9 @@ if (!user) {
 
                 {isEditing && (
                   <div className="flex space-x-2">
-                    <Button onClick={handleSave}>Save Changes</Button>
+                    <Button onClick={handleSave}>{t('Save Changes')}</Button>
                     <Button variant="outline" onClick={() => setIsEditing(false)}>
-                      Cancel
+                      {t('Cancel')}
                     </Button>
                   </div>
                 )}
@@ -269,16 +270,16 @@ if (!user) {
           <TabsContent value="orders">
             <Card>
               <CardHeader>
-                <CardTitle>Order History</CardTitle>
-                <CardDescription>View your past orders and track current ones</CardDescription>
+                <CardTitle>{t('Order History')}</CardTitle>
+                <CardDescription>{t('View your past orders and track current ones')}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="text-center py-8">
                   <Package className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">No orders yet</h3>
-                  <p className="text-muted-foreground mb-4">When you place your first order, it will appear here.</p>
+                  <h3 className="text-lg font-semibold mb-2">{t('No orders yet')}</h3>
+                  <p className="text-muted-foreground mb-4">{t('When you place your first order, it will appear here.')}</p>
                   <Button asChild>
-                    <a href="/products">Start Shopping</a>
+                    <a href="/products">{t('Start Shopping')}</a>
                   </Button>
                 </div>
               </CardContent>
@@ -288,18 +289,18 @@ if (!user) {
           <TabsContent value="wishlist">
             <Card>
               <CardHeader>
-                <CardTitle>Wishlist</CardTitle>
-                <CardDescription>Items you've saved for later</CardDescription>
+                <CardTitle>{t('Wishlist')}</CardTitle>
+                <CardDescription>{t("Items you've saved for later")}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="text-center py-8">
                   <Heart className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">Your wishlist is empty</h3>
+                  <h3 className="text-lg font-semibold mb-2">{t('Your wishlist is empty')}</h3>
                   <p className="text-muted-foreground mb-4">
-                    Save items you love to your wishlist for easy access later.
+                    {t('Save items you love to your wishlist for easy access later.')}
                   </p>
                   <Button asChild>
-                    <a href="/products">Browse Products</a>
+                    <a href="/products">{t('Browse Products')}</a>
                   </Button>
                 </div>
               </CardContent>
@@ -309,24 +310,24 @@ if (!user) {
           <TabsContent value="settings">
             <Card>
               <CardHeader>
-                <CardTitle>Account Settings</CardTitle>
-                <CardDescription>Manage your account preferences</CardDescription>
+                <CardTitle>{t('Account Settings')}</CardTitle>
+                <CardDescription>{t('Manage your account preferences')}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div>
-                  <h4 className="font-semibold mb-2">Email Notifications</h4>
+                  <h4 className="font-semibold mb-2">{t('Email Notifications')}</h4>
                   <div className="space-y-2">
                     <label className="flex items-center space-x-2">
                       <input type="checkbox" defaultChecked />
-                      <span className="text-sm">Order updates</span>
+                      <span className="text-sm">{t('Order updates')}</span>
                     </label>
                     <label className="flex items-center space-x-2">
                       <input type="checkbox" defaultChecked />
-                      <span className="text-sm">Promotional emails</span>
+                      <span className="text-sm">{t('Promotional emails')}</span>
                     </label>
                     <label className="flex items-center space-x-2">
                       <input type="checkbox" />
-                      <span className="text-sm">Newsletter</span>
+                      <span className="text-sm">{t('Newsletter')}</span>
                     </label>
                   </div>
                 </div>
@@ -338,11 +339,11 @@ if (!user) {
                   <div className="space-y-2">
                     <label className="flex items-center space-x-2">
                       <input type="checkbox" defaultChecked />
-                      <span className="text-sm">Allow data collection for personalization</span>
+                      <span className="text-sm">{t('Allow data collection for personalization')}</span>
                     </label>
                     <label className="flex items-center space-x-2">
                       <input type="checkbox" />
-                      <span className="text-sm">Share data with partners</span>
+                      <span className="text-sm">{t('Share data with partners')}</span>
                     </label>
                   </div>
                 </div>
@@ -350,9 +351,9 @@ if (!user) {
                 <Separator />
 
                 <div>
-                  <h4 className="font-semibold mb-2 text-destructive">Danger Zone</h4>
+                  <h4 className="font-semibold mb-2 text-destructive">{t('Danger Zone')}</h4>
                   <Button variant="destructive" size="sm">
-                    Delete Account
+                    {t('Delete Account')}
                   </Button>
                 </div>
               </CardContent>

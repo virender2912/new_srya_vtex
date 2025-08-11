@@ -242,10 +242,10 @@ export default function CheckoutPage() {
           <Button variant="ghost" size="sm" asChild>
             <Link href="/cart">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Cart
+              {t('Back to Cart')}
             </Link>
           </Button>
-          <h1 className="text-3xl font-bold">Checkout</h1>
+          <h1 className="text-3xl font-bold">{t('Checkout')}</h1>
         </div>
 
         {/* Progress Steps */}
@@ -273,7 +273,7 @@ export default function CheckoutPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <ShoppingBag className="h-5 w-5" />
-                    Review Your Cart Items
+                    {t('Review Your Cart Items')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -302,16 +302,18 @@ export default function CheckoutPage() {
                                     : item.productName}
                                 </h3>
                                 {item.skuName !== item.productName && (
-                                  <p className="text-sm text-muted-foreground mt-1">{item.skuName}</p>
+                                  <p className="text-sm text-muted-foreground mt-1">
+                                    {/* {item.skuName} */}
+                                    </p>
                                 )}
                               </Link>
-                              <p className="text-sm text-muted-foreground mt-1">{item.brand}</p>
+                              <p className="text-sm text-muted-foreground mt-1">{t(item.brand)}</p>
                             </div>
                           </div>
 
                           <div className="flex items-center justify-between mt-4">
                             <div className="flex items-center gap-3">
-                              <span className="text-sm text-muted-foreground">Quantity: {item.quantity}</span>
+                              <span className="text-sm text-muted-foreground">{t('Quantity')}: {item.quantity}</span>
                             </div>
 
                             <div className="text-right">
@@ -335,11 +337,11 @@ export default function CheckoutPage() {
 
                   <div className="flex justify-between items-center pt-4 border-t">
                     <div>
-                      <p className="text-sm text-muted-foreground">{cartState.totalItems} items</p>
+                      <p className="text-sm text-muted-foreground">{cartState.totalItems} {t('items')}</p>
                       <p className="font-semibold text-lg">{formatPrice(cartState.totalPrice)}</p>
                     </div>
                     <Button onClick={() => setCurrentStep(2)} className="w-auto">
-                      Continue to Shipping
+                      {t('Continue to Shipping')}
                     </Button>
                   </div>
                 </CardContent>
@@ -352,13 +354,13 @@ export default function CheckoutPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Truck className="h-5 w-5" />
-                    Shipping Address
+                    {t('Shipping Address')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="firstName">First Name *</Label>
+                      <Label htmlFor="firstName">{t('First Name')} *</Label>
                       <Input
                         id="firstName"
                         value={shippingAddress.firstName}
@@ -367,7 +369,7 @@ export default function CheckoutPage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="lastName">Last Name *</Label>
+                      <Label htmlFor="lastName">{t('Last Name')} *</Label>
                       <Input
                         id="lastName"
                         value={shippingAddress.lastName}
@@ -379,7 +381,7 @@ export default function CheckoutPage() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="email">Email *</Label>
+                      <Label htmlFor="email">{t('Email')} *</Label>
                       <Input
                         id="email"
                         type="email"
@@ -389,7 +391,7 @@ export default function CheckoutPage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="phone">Phone</Label>
+                      <Label htmlFor="phone">{t('Phone')}</Label>
                       <Input
                         id="phone"
                         value={shippingAddress.phone}
@@ -399,7 +401,7 @@ export default function CheckoutPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="address">Address *</Label>
+                    <Label htmlFor="address">{t('Address')} *</Label>
                     <Input
                       id="address"
                       value={shippingAddress.address}
@@ -410,7 +412,7 @@ export default function CheckoutPage() {
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="city">City *</Label>
+                      <Label htmlFor="city">{t('City')} *</Label>
                       <Input
                         id="city"
                         value={shippingAddress.city}
@@ -419,7 +421,7 @@ export default function CheckoutPage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="state">State</Label>
+                      <Label htmlFor="state">{t('State')}</Label>
                       <Select
                         value={shippingAddress.state}
                         onValueChange={(value) => handleAddressChange("state", value)}
@@ -436,7 +438,7 @@ export default function CheckoutPage() {
                       </Select>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="zipCode">ZIP Code *</Label>
+                      <Label htmlFor="zipCode">{t('ZIP Code')} *</Label>
                       <Input
                         id="zipCode"
                         value={shippingAddress.zipCode}
@@ -448,10 +450,10 @@ export default function CheckoutPage() {
 
                   <div className="flex gap-4">
                     <Button variant="outline" onClick={() => setCurrentStep(1)} className="flex-1">
-                      Back
+                      {t('Back')}
                     </Button>
                     <Button onClick={() => setCurrentStep(3)} disabled={!validateStep(2)} className="flex-1">
-                      Continue to Shipping Method
+                      {t('Continue to Shipping Method')}
                     </Button>
                   </div>
                 </CardContent>
@@ -462,7 +464,7 @@ export default function CheckoutPage() {
             {currentStep === 3 && (
               <Card>
                 <CardHeader>
-                  <CardTitle>Shipping Method</CardTitle>
+                  <CardTitle>{t('Shipping Method')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <RadioGroup value={selectedShipping} onValueChange={setSelectedShipping}>
@@ -484,10 +486,10 @@ export default function CheckoutPage() {
 
                   <div className="flex gap-4 mt-6">
                     <Button variant="outline" onClick={() => setCurrentStep(2)} className="flex-1">
-                      Back
+                      {t('Back')}
                     </Button>
                     <Button onClick={() => setCurrentStep(4)} className="flex-1">
-                      Continue to Payment
+                      {t('Continue to Payment')}
                     </Button>
                   </div>
                 </CardContent>
@@ -500,7 +502,7 @@ export default function CheckoutPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <CreditCard className="h-5 w-5" />
-                    Payment Method
+                    {t('Payment Method')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -571,10 +573,10 @@ export default function CheckoutPage() {
 
                   <div className="flex gap-4">
                     <Button variant="outline" onClick={() => setCurrentStep(3)} className="flex-1">
-                      Back
+                      {t('Back')}
                     </Button>
                     <Button onClick={() => setCurrentStep(5)} disabled={!validateStep(4)} className="flex-1">
-                      Review Order
+                      {t('Review Order')}
                     </Button>
                   </div>
                 </CardContent>
@@ -585,7 +587,7 @@ export default function CheckoutPage() {
             {currentStep === 5 && (
               <Card>
                 <CardHeader>
-                  <CardTitle>Review Your Order</CardTitle>
+                  <CardTitle>{t('Review Your Order')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="flex items-center space-x-2">
@@ -608,7 +610,7 @@ export default function CheckoutPage() {
 
                   <div className="flex gap-4">
                     <Button variant="outline" onClick={() => setCurrentStep(4)} className="flex-1">
-                      Back
+                      {t('Back')}
                     </Button>
                     <Button onClick={placeOrder} disabled={!agreeTerms || loading} className="flex-1">
                       {loading ? "Placing Order..." : `Place Order - ${formatPrice(total)}`}
@@ -623,7 +625,7 @@ export default function CheckoutPage() {
           <div className="lg:col-span-1">
             <Card className="sticky top-4">
               <CardHeader>
-                <CardTitle>Order Summary</CardTitle>
+                <CardTitle>{t('Order Summary')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {/* Items */}
@@ -656,20 +658,20 @@ export default function CheckoutPage() {
                 {/* Totals */}
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span>Subtotal</span>
+                    <span>{t('Subtotal')}</span>
                     <span>{formatPrice(subtotal)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Shipping</span>
+                    <span>{t('Shipping')}</span>
                     <span>{shippingCost === 0 ? "Free" : formatPrice(shippingCost)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Tax</span>
+                    <span>{t('Tax')}</span>
                     <span>{formatPrice(tax)}</span>
                   </div>
                   <Separator />
                   <div className="flex justify-between text-lg font-semibold">
-                    <span>Total</span>
+                    <span>{t('Total')}</span>
                     <span>{formatPrice(total)}</span>
                   </div>
                 </div>
@@ -677,7 +679,7 @@ export default function CheckoutPage() {
                 {/* Security */}
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Shield className="h-4 w-4" />
-                  <span>Secure checkout powered by VTEX</span>
+                  <span>{t('Secure checkout powered by VTEX')}</span>
                 </div>
               </CardContent>
             </Card>
