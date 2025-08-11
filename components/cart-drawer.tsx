@@ -65,7 +65,7 @@ const { t } = useTranslation()
                             ? item.productName_ar?.trim() || item.productName
                             : item.productName}
                         </h4>
-                        <p className="text-xs text-muted-foreground uppercase tracking-wide">{item.brand}</p>
+                        <p className="text-xs text-muted-foreground uppercase tracking-wide">{t(item.brand)}</p>
                       </Link>
 
                       <div className="flex items-center justify-between mt-3">
