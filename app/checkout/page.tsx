@@ -613,7 +613,7 @@ export default function CheckoutPage() {
                       {t('Back')}
                     </Button>
                     <Button onClick={placeOrder} disabled={!agreeTerms || loading} className="flex-1">
-                      {loading ? "Placing Order..." : `Place Order - ${formatPrice(total)}`}
+                      {loading ? "Placing Order..." : t(`Place Order - ${formatPrice(total)}`)}
                     </Button>
                   </div>
                 </CardContent>

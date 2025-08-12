@@ -435,6 +435,7 @@ securcheckout: "دفع آمن بنسبة 100%",
 'Creating account...': 'جارٍ إنشاء الحساب...',
 'Already have an account?': 'هل لديك حساب بالفعل؟',
 'Sign in': 'تسجيل الدخول',
+'Place Order': 'وضع النظام',
   },
 }
 

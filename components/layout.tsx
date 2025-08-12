@@ -229,6 +229,147 @@ const getTranslatedName = (slug: string, originalName: string): string => {
       </header>
 
       <main className="flex-1">{children}</main>
+       <footer className="bg-black text-white">
+        <div className="container py-16 adding-padding">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
+            <div>
+              <h3 className="text-2xl font-light mb-6 tracking-wider">
+                {t("syra")}
+              </h3>
+              <p className="text-white/80 leading-relaxed">
+                {t("brand_description")}
+              </p>
+            </div>
+            <div className="ftrshopmenu">
+              <h4 className="font-medium mb-6 uppercase tracking-wide">
+                {t("shop")}
+              </h4>
+              <ul className="space-y-3 text-white/80">
+                <li>
+                  <Link
+                    href="/category/women"
+                    className="hover:text-white transition-colors"
+                  >
+                    {t("women")}
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/category/men"
+                    className="hover:text-white transition-colors"
+                  >
+                    {t("men")}
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/category/kids"
+                    className="hover:text-white transition-colors"
+                  >
+                    {t("kids")}
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/category/baby"
+                    className="hover:text-white transition-colors"
+                  >
+                    {t("baby")}
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-medium mb-6 uppercase tracking-wide">
+                {t("customer_care")}
+              </h4>
+              <ul className="space-y-3 text-white/80">
+                <li>
+                  <Link
+                    href="/help"
+                    className="hover:text-white transition-colors"
+                  >
+                    {t("help_center")}
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/contact"
+                    className="hover:text-white transition-colors"
+                  >
+                    {t("contact_us")}
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/shipping"
+                    className="hover:text-white transition-colors"
+                  >
+                    {t("shipping_returns")}
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/size-guide"
+                    className="hover:text-white transition-colors"
+                  >
+                    {t("size_guide")}
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div>
+              {/* <h4 className="font-medium mb-6 uppercase tracking-wide">Connect</h4>
+              <ul className="space-y-3 text-white/80">
+                <li>
+                  <Link href="/newsletter" className="hover:text-white transition-colors">
+                    Newsletter
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#" className="hover:text-white transition-colors">
+                    Instagram
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#" className="hover:text-white transition-colors">
+                    Facebook
+                  </Link>
+                </li>
+                <li>
+                  <Link href="#" className="hover:text-white transition-colors">
+                    Twitter
+                  </Link>
+                </li>
+              </ul> */}
+
+              <h2 className="text-5xl font-light mb-6 tracking-tight">
+                {t("stay_in_the_loop")}
+              </h2>
+              {/* <p className="text-xl text-white/80 mb-12 max-w-2xl mx-auto">
+            Be the first to know about new arrivals, exclusive offers, and style tips from our fashion experts
+          </p> */}
+
+              <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto mb-8 ftrnewslter">
+                <input
+                  type="email"
+                  placeholder={t("enter_your_email")}
+                  className="flex-1 px-6 py-4 rounded-full text-black text-lg"
+                />
+                <Button
+                  size="lg"
+                  className="bg-white text-black hover:bg-white/90 px-8 py-4 rounded-full"
+                >
+                  {t("subscribe")}
+                </Button>
+              </div>
+            </div>
+          </div>
+          <div className="mt-12 pt-8 border-t border-white/20 text-center text-white/60">
+            <p>{t("footer_lower_text")}</p>
+          </div>
+        </div>
+      </footer>
     </div>
-  )
+  );
 }
