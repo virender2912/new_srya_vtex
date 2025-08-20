@@ -419,14 +419,14 @@ export function formatPrice(price: number) {
 
 
 
-export function formatPricee(price: number) {
-  return new Intl.NumberFormat("en-AE", {
-    style: "currency",
-    currency: "AED",
-  }).format(price / 10000)
+// export function formatPricee(price: number) {
+//   return new Intl.NumberFormat("en-AE", {
+//     style: "currency",
+//     currency: "AED",
+//   }).format(price / 10000)
 
   
-}
+// }
 
 
 // export function formatPrice(price: number, currency: string = "SAR") {

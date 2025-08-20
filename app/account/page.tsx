@@ -1,100 +1,137 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { Package, Heart, LogOut, Edit } from "lucide-react"
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Package, Heart, LogOut, Edit } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator"
-import { Layout } from "@/components/layout"
-import { useAuth } from "@/contexts/auth-context"
-import { useCart } from "@/contexts/cart-context"
-import { useWishlist } from "@/contexts/wishlist-context"
-import { useTranslation } from "@/hooks/use-translation"
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { Layout } from "@/components/layout";
+import { useAuth } from "@/contexts/auth-context";
+import { useCart } from "@/contexts/cart-context";
+import { useWishlist } from "@/contexts/wishlist-context";
+import Link from "next/link";
+
 export default function AccountPage() {
-    const { t } = useTranslation()
-  const { state: authState, logout } = useAuth()
-  const { state: cartState } = useCart()
-  const { state: wishlistState } = useWishlist()
-  const router = useRouter()
-  const [isEditing, setIsEditing] = useState(false)
+  const { state: authState, logout } = useAuth();
+  const { state: cartState } = useCart();
+  const { state: wishlistState } = useWishlist();
+  const router = useRouter();
+  const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     email: "",
     phone: "",
-  })
+  });
 
-useEffect(() => {
-  const getUserFromCookies = () => {
-    if (typeof document === "undefined") return null
-    const cookieObj = Object.fromEntries(
-      document.cookie.split("; ").map(c => {
-        const [key, ...v] = c.split("=")
-        return [key, decodeURIComponent(v.join("="))]
-      })
-    )
-    const fullName = cookieObj.customerName || ""
-    const email = cookieObj.customerEmail || ""
-    const [firstName, ...rest] = fullName.split(" ")
-    const lastName = rest.join(" ")
+  const [orders, setOrders] = useState<any[]>([]); // store fetched orders
+  const [ordersLoading, setOrdersLoading] = useState(true);
 
-    if (email && fullName) {
-      return {
-        firstName,
-        lastName,
-        email,
-        phone: "", // You can pull this from VTEX API if needed
+  useEffect(() => {
+    const getUserFromCookies = () => {
+      if (typeof document === "undefined") return null;
+      const cookieObj = Object.fromEntries(
+        document.cookie.split("; ").map((c) => {
+          const [key, ...v] = c.split("=");
+          return [key, decodeURIComponent(v.join("="))];
+        })
+      );
+      const fullName = cookieObj.customerName || "";
+      const email = cookieObj.customerEmail || "";
+      const [firstName, ...rest] = fullName.split(" ");
+      const lastName = rest.join(" ");
+
+      if (email && fullName) {
+        return {
+          firstName,
+          lastName,
+          email,
+          phone: "", // You can pull this from VTEX API if needed
+        };
       }
-    }
 
-    return null
-  }
+      return null;
+    };
 
-  if (!authState.isLoading && !authState.isAuthenticated) {
-    const cookieUser = getUserFromCookies()
-    if (cookieUser) {
-      setFormData(cookieUser)
-      localStorage.setItem("vtexUser", JSON.stringify(cookieUser))
-    } else {
-      const storedUser = localStorage.getItem("vtexUser")
-      if (storedUser) {
-        setFormData(JSON.parse(storedUser))
+    if (!authState.isLoading && !authState.isAuthenticated) {
+      const cookieUser = getUserFromCookies();
+      if (cookieUser) {
+        setFormData(cookieUser);
+        localStorage.setItem("vtexUser", JSON.stringify(cookieUser));
       } else {
-        router.push("/login")
+        const storedUser = localStorage.getItem("vtexUser");
+        if (storedUser) {
+          setFormData(JSON.parse(storedUser));
+        } else {
+          router.push("/login");
+        }
       }
+    } else if (authState.user) {
+      setFormData({
+        firstName: authState.user.firstName,
+        lastName: authState.user.lastName,
+        email: authState.user.email,
+        phone: authState.user.phone || "",
+      });
     }
-  } else if (authState.user) {
-    setFormData({
-      firstName: authState.user.firstName,
-      lastName: authState.user.lastName,
-      email: authState.user.email,
-      phone: authState.user.phone || "",
-    })
-  }
-}, [authState, router])
+  }, [authState, router]);
+
+  // code for order history by email
+  const users = authState.user?.email;
+  console.log(users);
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        setOrdersLoading(true);
+        if (!users) return; // ensure users is defined
+
+        const res = await fetch(
+          `/api/getorders?email=${encodeURIComponent(users)}`
+        );
+        console.log("res", res);
+
+        if (!res.ok) throw new Error(`Error: ${res.status}`);
+        const data = await res.json();
+        console.log("VTEX orders:", data.list);
+        setOrders(data.list); // `data.list` usually contains the orders array
+      } catch (err) {
+        console.error("Failed to fetch orders:", err);
+      } finally {
+        setOrdersLoading(false);
+      }
+    };
+
+    fetchOrders();
+  }, [users]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleSave = () => {
     // Here you would typically make an API call to update user data
-    console.log("Saving user data:", formData)
-    setIsEditing(false)
-  }
+    console.log("Saving user data:", formData);
+    setIsEditing(false);
+  };
 
   const handleLogout = () => {
-    logout()
-    router.push("/")
-  }
+    logout();
+    router.push("/");
+  };
 
   if (authState.isLoading) {
     return (
@@ -110,17 +147,15 @@ useEffect(() => {
           </div>
         </div>
       </Layout>
-    )
+    );
   }
-const storedUser =
-  typeof window !== "undefined" ? localStorage.getItem("vtexUser") : null
-const user =
-  authState.user ||
-  (storedUser ? JSON.parse(storedUser) : null)
+  const storedUser =
+    typeof window !== "undefined" ? localStorage.getItem("vtexUser") : null;
+  const user = authState.user || (storedUser ? JSON.parse(storedUser) : null);
 
-if (!user) {
-  return null
-}
+  if (!user) {
+    return null;
+  }
 
   return (
     <Layout>
@@ -129,13 +164,13 @@ if (!user) {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold">My Account</h1>
-      <p className="text-muted-foreground">
-  {t('Welcome Back')}, {user.firstName} {user.lastName}
-</p>
+            <p className="text-muted-foreground">
+              Welcome back, {user.firstName} {user.lastName} 
+            </p>
           </div>
           <Button variant="outline" onClick={handleLogout}>
             <LogOut className="h-4 w-4 mr-2" />
-            {t('Logout')}
+            Logout
           </Button>
         </div>
 
@@ -148,8 +183,8 @@ if (!user) {
                   <Package className="h-6 w-6 text-primary" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold">0</p>
-                  <p className="text-sm text-muted-foreground">{t('Orders')}</p>
+                  <p className="text-2xl font-bold">{orders.length}</p>
+                  <p className="text-sm text-muted-foreground">Orders</p>
                 </div>
               </div>
             </CardContent>
@@ -162,8 +197,12 @@ if (!user) {
                   <Heart className="h-6 w-6 text-primary" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold">{wishlistState.totalItems}</p>
-                  <p className="text-sm text-muted-foreground">{t('Wishlist Items')}</p>
+                  <p className="text-2xl font-bold">
+                    {wishlistState.totalItems}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Wishlist Items
+                  </p>
                 </div>
               </div>
             </CardContent>
@@ -177,7 +216,7 @@ if (!user) {
                 </div>
                 <div>
                   <p className="text-2xl font-bold">{cartState.totalItems}</p>
-                  <p className="text-sm text-muted-foreground">{t('Cart Items')}</p>
+                  <p className="text-sm text-muted-foreground">Cart Items</p>
                 </div>
               </div>
             </CardContent>
@@ -187,10 +226,10 @@ if (!user) {
         {/* Account Tabs */}
         <Tabs defaultValue="profile" className="space-y-6">
           <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="profile">{t('Profile')}</TabsTrigger>
-            <TabsTrigger value="orders">{t('Orders')}</TabsTrigger>
-            <TabsTrigger value="wishlist">{t('Wishlist')}</TabsTrigger>
-            <TabsTrigger value="settings">{t('Settings')}</TabsTrigger>
+            <TabsTrigger value="profile">Profile</TabsTrigger>
+            <TabsTrigger value="orders">Orders</TabsTrigger>
+            <TabsTrigger value="wishlist">Wishlist</TabsTrigger>
+            <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
 
           <TabsContent value="profile">
@@ -198,10 +237,16 @@ if (!user) {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle>{t('Profile Information')}</CardTitle>
-                    <CardDescription>{t('Manage your personal information')}</CardDescription>
+                    <CardTitle>Profile Information</CardTitle>
+                    <CardDescription>
+                      Manage your personal information
+                    </CardDescription>
                   </div>
-                  <Button variant="outline" size="sm" onClick={() => setIsEditing(!isEditing)}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsEditing(!isEditing)}
+                  >
                     <Edit className="h-4 w-4 mr-2" />
                     {isEditing ? "Cancel" : "Edit"}
                   </Button>
@@ -210,7 +255,7 @@ if (!user) {
               <CardContent className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="firstName">{t('First Name')}</Label>
+                    <Label htmlFor="firstName">First Name</Label>
                     <Input
                       id="firstName"
                       name="firstName"
@@ -220,7 +265,7 @@ if (!user) {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="lastName">{t('Last Name')}</Label>
+                    <Label htmlFor="lastName">Last Name</Label>
                     <Input
                       id="lastName"
                       name="lastName"
@@ -232,7 +277,7 @@ if (!user) {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="email">{t('Email')}</Label>
+                  <Label htmlFor="email">Email</Label>
                   <Input
                     id="email"
                     name="email"
@@ -244,7 +289,7 @@ if (!user) {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="phone">{t('Phone')}</Label>
+                  <Label htmlFor="phone">Phone</Label>
                   <Input
                     id="phone"
                     name="phone"
@@ -257,9 +302,12 @@ if (!user) {
 
                 {isEditing && (
                   <div className="flex space-x-2">
-                    <Button onClick={handleSave}>{t('Save Changes')}</Button>
-                    <Button variant="outline" onClick={() => setIsEditing(false)}>
-                      {t('Cancel')}
+                    <Button onClick={handleSave}>Save Changes</Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsEditing(false)}
+                    >
+                      Cancel
                     </Button>
                   </div>
                 )}
@@ -270,18 +318,56 @@ if (!user) {
           <TabsContent value="orders">
             <Card>
               <CardHeader>
-                <CardTitle>{t('Order History')}</CardTitle>
-                <CardDescription>{t('View your past orders and track current ones')}</CardDescription>
+                <CardTitle>Order History</CardTitle>
+                <CardDescription>
+                  View your past orders and track current ones
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-center py-8">
-                  <Package className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">{t('No orders yet')}</h3>
-                  <p className="text-muted-foreground mb-4">{t('When you place your first order, it will appear here.')}</p>
-                  <Button asChild>
-                    <a href="/products">{t('Start Shopping')}</a>
-                  </Button>
-                </div>
+                {ordersLoading ? (
+                  <p>Loading orders...</p>
+                ) : orders.length > 0 ? (
+                  <ul className="space-y-4">
+                    {orders.map((d) => (
+                      <li key={d.orderId} className="border p-4 rounded">
+                        <p>
+                          <strong>Order ID:</strong> {d.orderId}{" "}
+                        </p>
+                        <p>
+                          <strong>Status:</strong> {d.status}
+                        </p>
+                        <p>
+                          <strong>Date:</strong>{" "}
+                          {new Date(d.creationDate).toLocaleString()}
+                        </p>
+                        <p>
+                          <strong>Total:</strong> {d.totalValue}{" "}
+                          {d.currencyCode}
+                        </p>
+                        <Link
+                          href={`/orders/${d.orderId}`}
+                          target="blank"
+                          className="inline-block px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200"
+                        >
+                          View Order
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <div className="text-center py-8">
+                    <Package className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                    <h3 className="text-lg font-semibold mb-2">
+                      No orders yet
+                    </h3>
+                    <p className="text-muted-foreground mb-4">
+                      When you place your first order, it will appear here.
+                    </p>
+                    <Button asChild>
+                      <a href="/products">Start Shopping</a>
+                    </Button>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -289,18 +375,20 @@ if (!user) {
           <TabsContent value="wishlist">
             <Card>
               <CardHeader>
-                <CardTitle>{t('Wishlist')}</CardTitle>
-                <CardDescription>{t("Items you've saved for later")}</CardDescription>
+                <CardTitle>Wishlist</CardTitle>
+                <CardDescription>Items you've saved for later</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="text-center py-8">
                   <Heart className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">{t('Your wishlist is empty')}</h3>
+                  <h3 className="text-lg font-semibold mb-2">
+                    Your wishlist is empty
+                  </h3>
                   <p className="text-muted-foreground mb-4">
-                    {t('Save items you love to your wishlist for easy access later.')}
+                    Save items you love to your wishlist for easy access later.
                   </p>
                   <Button asChild>
-                    <a href="/products">{t('Browse Products')}</a>
+                    <a href="/products">Browse Products</a>
                   </Button>
                 </div>
               </CardContent>
@@ -310,24 +398,26 @@ if (!user) {
           <TabsContent value="settings">
             <Card>
               <CardHeader>
-                <CardTitle>{t('Account Settings')}</CardTitle>
-                <CardDescription>{t('Manage your account preferences')}</CardDescription>
+                <CardTitle>Account Settings</CardTitle>
+                <CardDescription>
+                  Manage your account preferences
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div>
-                  <h4 className="font-semibold mb-2">{t('Email Notifications')}</h4>
+                  <h4 className="font-semibold mb-2">Email Notifications</h4>
                   <div className="space-y-2">
                     <label className="flex items-center space-x-2">
                       <input type="checkbox" defaultChecked />
-                      <span className="text-sm">{t('Order updates')}</span>
+                      <span className="text-sm">Order updates</span>
                     </label>
                     <label className="flex items-center space-x-2">
                       <input type="checkbox" defaultChecked />
-                      <span className="text-sm">{t('Promotional emails')}</span>
+                      <span className="text-sm">Promotional emails</span>
                     </label>
                     <label className="flex items-center space-x-2">
                       <input type="checkbox" />
-                      <span className="text-sm">{t('Newsletter')}</span>
+                      <span className="text-sm">Newsletter</span>
                     </label>
                   </div>
                 </div>
@@ -339,11 +429,13 @@ if (!user) {
                   <div className="space-y-2">
                     <label className="flex items-center space-x-2">
                       <input type="checkbox" defaultChecked />
-                      <span className="text-sm">{t('Allow data collection for personalization')}</span>
+                      <span className="text-sm">
+                        Allow data collection for personalization
+                      </span>
                     </label>
                     <label className="flex items-center space-x-2">
                       <input type="checkbox" />
-                      <span className="text-sm">{t('Share data with partners')}</span>
+                      <span className="text-sm">Share data with partners</span>
                     </label>
                   </div>
                 </div>
@@ -351,9 +443,11 @@ if (!user) {
                 <Separator />
 
                 <div>
-                  <h4 className="font-semibold mb-2 text-destructive">{t('Danger Zone')}</h4>
+                  <h4 className="font-semibold mb-2 text-destructive">
+                    Danger Zone
+                  </h4>
                   <Button variant="destructive" size="sm">
-                    {t('Delete Account')}
+                    Delete Account
                   </Button>
                 </div>
               </CardContent>
@@ -362,5 +456,5 @@ if (!user) {
         </Tabs>
       </div>
     </Layout>
-  )
+  );
 }
