@@ -412,7 +412,7 @@ export function formatPrice(price: number) {
   return new Intl.NumberFormat("en-AE", {
     style: "currency",
     currency: "AED",
-  }).format(price / 100)
+  }).format(price)
 
   
 }
