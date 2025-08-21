@@ -759,7 +759,7 @@ export default function CheckoutPage() {
                   </div>
                   <div className="flex justify-between">
                     <span>Tax</span>
-                    <span>5</span>
+                    <span>AED 5</span>
                   </div>
                   <Separator />
                   <div className="flex justify-between text-lg font-semibold">
