@@ -239,7 +239,7 @@ export default function OrderPage({
                   {order.shippingData.address.city},{" "}
                   {order.shippingData.address.state}
                 </p>
-                <p>{order.shippingData.address.country}</p>
+               
                 <p>
                   Postal Code: {order.shippingData.address.postalCode || "N/A"}
                 </p>
