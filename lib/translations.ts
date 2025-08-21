@@ -392,6 +392,7 @@ securcheckout: "دفع آمن بنسبة 100%",
 'Clear Cart': 'عربة واضحة',
 // ACCOUNT PAGE
 'Welcome Back': 'مرحبًا بعودتك',
+'Welcome back': 'مرحبًا بعودتك',
 'Sign in to your account to continue shopping': 'قم بتسجيل الدخول إلى حسابك لمواصلة التسوق',
 'Logout' : 'تسجيل الخروج',
 'Orders' : 'طلبات',
