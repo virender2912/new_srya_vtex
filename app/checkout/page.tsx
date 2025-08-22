@@ -616,7 +616,7 @@ export default function CheckoutPage() {
                         {shippingAddress.city}, {shippingAddress.state}{" "}
                         {shippingAddress.zipCode}
                       </p>
-                      <p>{shippingAddress.country}</p>
+                      {/* <p>{shippingAddress.country}</p> */}
                       <p className="mt-2">{shippingAddress.email}</p>
                       <p>{shippingAddress.phone}</p>
                     </div>
