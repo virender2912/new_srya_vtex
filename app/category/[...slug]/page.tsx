@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 import { Grid, List } from "lucide-react"
 import { useTranslation } from "@/hooks/use-translation"
+import { Loader2 } from "lucide-react"
 
 
 interface Category {
@@ -26,7 +27,7 @@ export default function CategoryPage() {
   const params = useParams()
   const slugParam = params.slug as string[] | string
   const fullSlug = Array.isArray(slugParam) ? slugParam.join("/") : slugParam
-const { t } = useTranslation()
+  const { t } = useTranslation()
   const [category, setCategory] = useState<Category | null>(null)
   const [products, setProducts] = useState<any[]>([])
   const [filteredProducts, setFilteredProducts] = useState<any[]>([])
@@ -36,41 +37,51 @@ const { t } = useTranslation()
   const [priceRange, setPriceRange] = useState([0, 1000])
   const [sortBy, setSortBy] = useState("relevance")
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
+  const [loading, setLoading] = useState(false)
+
+
 
   useEffect(() => {
     const load = async () => {
-      const res = await fetch("/api/categories")
-      const allCategories: Category[] = await res.json()
+      setLoading(true) // ✅ start loading
+      try {
+        const res = await fetch("/api/categories")
+        const allCategories: Category[] = await res.json()
 
-      const findCat = (cats: Category[]): Category | null => {
-        for (const cat of cats) {
-          if (cat.slug === fullSlug) return cat
-          if (cat.children?.length) {
-            const found = findCat(cat.children)
-            if (found) return found
+        const findCat = (cats: Category[]): Category | null => {
+          for (const cat of cats) {
+            if (cat.slug === fullSlug) return cat
+            if (cat.children?.length) {
+              const found = findCat(cat.children)
+              if (found) return found
+            }
           }
+          return null
         }
-        return null
-      }
 
-      const matched = findCat(allCategories)
-      setCategory(matched)
+        const matched = findCat(allCategories)
+        setCategory(matched)
 
-      if (matched) {
-        const productRes = await fetch(`/api/products?category=${matched.idPath}`)
-        const data = await productRes.json()
-        const products = data.products || []
+        if (matched) {
+          const productRes = await fetch(`/api/products?category=${matched.idPath}`)
+          const data = await productRes.json()
+          const products = data.products || []
 
-        setProducts(products)
-        setFilteredProducts(products)
+          setProducts(products)
+          setFilteredProducts(products)
 
-        const brands = [...new Set(products.map((p: any) => p.brand))] as string[]
-        setAvailableBrands(brands)
+          const brands = [...new Set(products.map((p: any) => p.brand))] as string[]
+          setAvailableBrands(brands)
+        }
+      } finally {
+        setLoading(false) // ✅ stop loading
       }
     }
 
     if (fullSlug) load()
   }, [fullSlug])
+
+
 
   // Filters
   useEffect(() => {
@@ -129,8 +140,8 @@ const { t } = useTranslation()
       <div className="container py-8">
         <h1 className="text-3xl font-bold mb-4">
           {/* {category?.name || "Category"} */}
-           {category ? t(category.name) : t("Category")}
-          </h1>
+          {category ? t(category.name) : t("Category")}
+        </h1>
 
         {/* Filters */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
@@ -152,9 +163,9 @@ const { t } = useTranslation()
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="relevance">{t("relevance")}</SelectItem>
-                             <SelectItem value="price-low">{t("price")}: {t("lowToHigh")}</SelectItem>
-                             <SelectItem value="price-high">{t("price")}: {t("highToLow")}</SelectItem>
-                             <SelectItem value="name">{t("name")}</SelectItem>
+                  <SelectItem value="price-low">{t("price")}: {t("lowToHigh")}</SelectItem>
+                  <SelectItem value="price-high">{t("price")}: {t("highToLow")}</SelectItem>
+                  <SelectItem value="name">{t("name")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -186,7 +197,7 @@ const { t } = useTranslation()
             )}
 
             <Button variant="outline" onClick={clearFilters}>
-                {t("clearFilters")}
+              {t("clearFilters")}
             </Button>
           </div>
 
@@ -194,6 +205,7 @@ const { t } = useTranslation()
           <div className="lg:col-span-3">
             <div className="flex justify-end mb-4 gridstyle">
               <Button
+                className="mr-2 ml-2"
                 variant={viewMode === "grid" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setViewMode("grid")}
@@ -209,17 +221,27 @@ const { t } = useTranslation()
               </Button>
             </div>
 
-            {filteredProducts.length > 0 ? (
+
+
+
+            {/* ✅ Show loading instead of "No products found" */}
+            {loading ? (
+              <div className="flex items-center justify-center py-10">
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                <span className="ml-2 text-muted-foreground">Loading...</span>
+              </div>
+            ) : filteredProducts.length > 0 ? (
               <div
                 className={`grid gap-6 ${viewMode === "grid" ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-1"}`}
               >
                 {filteredProducts.map((product) => (
                   <ProductCard key={product.productId} product={product} />
                 ))}
-              </div>
+              </div> 
             ) : (
               <p className="text-muted-foreground">No products found.</p>
             )}
+
           </div>
         </div>
       </div>
