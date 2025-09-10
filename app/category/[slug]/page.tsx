@@ -16,7 +16,8 @@ import { Label } from "@/components/ui/label"
 import { Layout } from "@/components/layout"
 import { ProductCard } from "@/components/product-card"
 import type { VtexProduct } from "@/lib/vtex-api"
-  import { useTranslation } from "@/hooks/use-translation" // custom translation hook
+import { useTranslation } from "@/hooks/use-translation" // custom translation hook
+import { Loader2 } from "lucide-react"
 
 interface CategoryData {
   id: string
@@ -149,7 +150,10 @@ export default function CategoryPage() {
     return (
       <Layout>
         <div className="container py-8">
-          <p>{t("loading")}</p>
+          <div className="flex items-center justify-center py-10">
+            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            <span className="ml-2 text-muted-foreground">{t("loading")}...</span>
+          </div>
         </div>
       </Layout>
     )
