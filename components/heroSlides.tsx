@@ -14,6 +14,16 @@ function HeroSlides() {
     const { t } = useTranslation();
     const heroSlides = [
         {
+            id: 3,
+            title: "slider_title_2",
+            subtitle: "slider_subtitle_2",
+            description: "slider_description_2",
+            cta: "slider_cta_2",
+            image: "/images/banner-2.jpg",
+            link: "/category/women",
+            theme: "dark",
+        },
+        {
             id: 1,
             title: "slider_title_3",
             subtitle: "slider_subtitle_3",
@@ -32,17 +42,8 @@ function HeroSlides() {
             image: "/images/women-banner.jpg",
             link: "/category/kids",
             theme: "dark",
-        },
-        {
-            id: 3,
-            title: "slider_title_2",
-            subtitle: "slider_subtitle_2",
-            description: "slider_description_2",
-            cta: "slider_cta_2",
-            image: "/images/banner-2.jpg",
-            link: "/category/women",
-            theme: "dark",
         }
+        
     ];
 
     const [currentSlide, setCurrentSlide] = useState(0);
