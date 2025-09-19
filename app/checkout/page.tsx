@@ -10,13 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
 import { Separator } from "@/components/ui/separator";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -24,6 +18,8 @@ import { Layout } from "@/components/layout";
 import { useCart } from "@/contexts/cart-context";
 import { useAuth } from "@/contexts/auth-context";
 import { formatPrice } from "@/lib/vtex-api";
+import { v4 as uuidv4 } from 'uuid';
+import { NextResponse } from "next/server";
 
 interface ShippingAddress {
   firstName: string;
@@ -38,13 +34,18 @@ interface ShippingAddress {
 }
 
 interface PaymentMethod {
-  type: "credit" | "debit" | "pix" | "boleto" | "cash" | "tab";
+  type: "cash" | "tab";
   cardNumber?: string;
   expiryDate?: string;
   cvv?: string;
   cardName?: string;
   tabPhone?: string;
 }
+
+const paymentSystemMap: Record<PaymentMethod["type"], string> = {
+  cash: "201",
+  tab: "203",
+};
 
 export default function CheckoutPage() {
   const { state: cartState, clearCart } = useCart();
@@ -56,6 +57,9 @@ export default function CheckoutPage() {
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [orderId, setOrderId] = useState("");
   const [tabPaymentInitiated, setTabPaymentInitiated] = useState(false);
+
+  const [tabUrl, setTabUrl] = useState<string | null>(null);
+  const [tabId, setTabId] = useState<string | null>(null);
 
   const [shippingAddress, setShippingAddress] = useState<ShippingAddress>({
     firstName: authState.user?.firstName || "",
@@ -70,7 +74,7 @@ export default function CheckoutPage() {
   });
 
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>({
-    type: "credit",
+    type: "tab",
   });
 
   const [selectedShipping, setSelectedShipping] = useState("standard");
@@ -109,7 +113,7 @@ export default function CheckoutPage() {
     if (!authState.isLoading && !authState.isAuthenticated) {
       router.push("/login?redirect=/checkout");
     }
-    if (cartState.items.length === 0 && !orderPlaced) {
+    if (cartState.items.length === 0 && !orderPlaced && !tabPaymentInitiated) {
       router.push("/cart");
     }
   }, [authState, cartState, router, orderPlaced]);
@@ -136,14 +140,7 @@ export default function CheckoutPage() {
       case 2:
         return selectedShipping;
       case 3:
-        if (paymentMethod.type === "credit" || paymentMethod.type === "debit") {
-          return (
-            paymentMethod.cardNumber &&
-            paymentMethod.expiryDate &&
-            paymentMethod.cvv &&
-            paymentMethod.cardName
-          );
-        }
+
         if (paymentMethod.type === "tab") {
           return paymentMethod.tabPhone;
         }
@@ -160,14 +157,14 @@ export default function CheckoutPage() {
         return total + item.price * item.quantity;
       }, 0);
 
-      // If using Tab payment, we need to handle it differently
+
+      // If using tap payment, we need to handle it differently
       if (paymentMethod.type === "tab") {
-
         const totalPrice = cartState.items.reduce((total, item) => {
-        return total + item.price * item.quantity;
-      }, 0);
+          return total + item.price * item.quantity;
+        }, 0);
 
-        const amount = totalPrice +5  ;
+        const amount = totalPrice + 5;
 
         try {
           const res = await fetch("/api/tab-payment/create-charge", {
@@ -177,45 +174,61 @@ export default function CheckoutPage() {
             },
             body: JSON.stringify({
               amount,
-              currency: "KWD",
+              currency: "AED",
               customer_initiated: true,
               threeDSecure: true,
               save_card: false,
               description: "Test Description",
               metadata: { udf1: "Metadata 1" },
               receipt: { email: false, sms: false },
-              reference: { transaction: "txn_01", order: "ord_01" },
+              reference: { transaction: `txn_${uuidv4()}`, order: `ord_${uuidv4()}` },
               customer: {
-                first_name: "test",
-                middle_name: "test",
-                last_name: "test",
-                email: "test@test.com",
+                first_name: shippingAddress.firstName,
+                last_name: shippingAddress.lastName,
+                email: shippingAddress.email,
                 phone: { country_code: 965, number: 51234567 },
               },
               merchant: { id: "586147215" },
               source: { id: "src_all" },
               post: { url: "http://your_website.com/post_url" },
               redirect: {
-                url: `${window.location.origin}/payment-confirmation`,
-               
+                url: `${window.location.origin}/tapaccount`,
               },
             }),
           });
 
           const data = await res.json();
-          console.log("Tab API Response:", data);
+          const taburl = data.transaction?.url;
+          const tabid = data.id;
+          setTabId(tabid);
+          console.log("tap API Response:", data);
 
-          if (data.transaction?.url) {
+
+          if (data.id && taburl) {
+            setTabPaymentInitiated(true);
+            setTabUrl(taburl);
+            // clearCart();
+
+            const checkoutData = {
+              shippingAddress,
+              cartItems: cartState.items,
+              totalPrice: cartState.items.reduce((total, item) => total + item.price * item.quantity, 0)
+            };
+            sessionStorage.setItem('tabCheckoutData', JSON.stringify(checkoutData));
             window.location.href = data.transaction.url;
           }
+
+
+
         } catch (err) {
-          console.error("Tab payment error:", err);
+          console.error("tap payment error:", err);
         }
         finally {
           setLoading(false);
         }
       } else {
         // Regular order placement for other payment methods
+
         const orderPayload = {
           items: cartState.items.map((item) => ({
             id: item.skuId,
@@ -259,14 +272,7 @@ export default function CheckoutPage() {
           paymentData: {
             payments: [
               {
-                paymentSystem:
-                  paymentMethod.type === "credit"
-                    ? "1"
-                    : paymentMethod.type === "debit"
-                      ? "2"
-                      : paymentMethod.type === "cash"
-                        ? "201"
-                        : "201",
+                paymentSystem: paymentSystemMap[paymentMethod.type],
                 value: totalPrice * 100 + 500,
                 referenceValue: totalPrice * 100 + 500,
                 installments: 1,
@@ -274,6 +280,8 @@ export default function CheckoutPage() {
             ],
           },
         };
+
+
 
         const response = await fetch("/api/orders", {
           method: "POST",
@@ -300,32 +308,9 @@ export default function CheckoutPage() {
     }
   };
 
-  // const initiateTabPayment = async (amount: number) => {
-  //   // This would call your backend API to initiate a Tab payment
-  //   try {
-  //     const response = await fetch("/api/payments/tab/initiate", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({
-  //         amount: amount + 5, // Total including shipping
-  //         currency: "AED",
-  //         customer: {
-  //           name: `${shippingAddress.firstName} ${shippingAddress.lastName}`,
-  //           email: shippingAddress.email,
-  //           phone: paymentMethod.tabPhone || shippingAddress.phone,
-  //         },
-  //         redirectUrl: `${window.location.origin}/payment-confirmation`,
-  //       }),
-  //     });
 
-  //     return await response.json();
-  //   } catch (error) {
-  //     console.error("Tab payment initiation error:", error);
-  //     return { success: false, error: "Failed to initiate Tab payment" };
-  //   }
-  // };
+  // const tabresponse = fetch(`https://api.tap.company/v2/charges/${tabId}`)
+
 
   if (orderPlaced) {
     return (
@@ -366,9 +351,9 @@ export default function CheckoutPage() {
             <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-8">
               <ExternalLink className="h-10 w-10 text-blue-600" />
             </div>
-            <h1 className="text-4xl font-bold mb-4">Complete Your Payment with Tab</h1>
+            <h1 className="text-4xl font-bold mb-4">Complete Your Payment with Tap</h1>
             <p className="text-xl text-muted-foreground mb-8">
-              You've been redirected to Tab's secure payment portal to complete your transaction.
+              You've been redirected to tap's secure payment portal to complete your transaction.
               Please complete the payment process to confirm your order.
             </p>
             <div className="bg-gray-50 rounded-lg p-6 mb-8">
@@ -379,17 +364,18 @@ export default function CheckoutPage() {
               </p>
             </div>
             <div className="space-y-4">
-              <Button size="lg" onClick={() => window.open("#", "_blank")}>
-                Open Tab Payment Page
+              <Button size="lg" onClick={() => tabUrl && window.open(tabUrl, "_blank")}>
+
+                Open tap Payment Page
               </Button>
-              <Button variant="outline" size="lg" asChild>
-                <Link href="/orders">View Order Status</Link>
+              <Button variant="outline" size="lg" className="ml-3" asChild>
+                <Link href="/account">View Order Status</Link>
               </Button>
             </div>
             <div className="mt-8 p-4 bg-yellow-50 rounded-lg text-left">
               <h3 className="font-medium mb-2">Important:</h3>
               <p className="text-sm">
-                Your order will be processed once we receive confirmation of your payment from Tab.
+                Your order will be processed once we receive confirmation of your payment from tap.
                 If you've already completed the payment, it may take a few minutes for the status to update.
               </p>
             </div>
@@ -632,113 +618,55 @@ export default function CheckoutPage() {
                     }
                   >
                     <div className="flex flex-col gap-4">
+                     
                       <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="credit" id="credit" />
-                        <Label htmlFor="credit">Credit Card</Label>
+                        <RadioGroupItem value="tab" id="tab" />
+                        <Label htmlFor="tab" className="flex items-center">
+                         Secure payment with Tap Payment
+                          <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                            Debit card / Credit card
+                          </span>
+                        </Label>
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="debit" id="debit" />
-                        <Label htmlFor="debit">Debit Card</Label>
-                      </div>
+                       
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="cash" id="cash" />
                         <Label htmlFor="cash">Cash On Delivery</Label>
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="tab" id="tab" />
-                        <Label htmlFor="tab" className="flex items-center">
-                          Tab Payment
-                          <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                            Popular in UAE
-                          </span>
-                        </Label>
-                      </div>
+
                     </div>
                   </RadioGroup>
 
-                  {(paymentMethod.type === "credit" ||
-                    paymentMethod.type === "debit") && (
-                      <div className="space-y-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="cardName">Cardholder Name *</Label>
-                          <Input
-                            id="cardName"
-                            value={paymentMethod.cardName || ""}
-                            onChange={(e) =>
-                              handlePaymentChange("cardName", e.target.value)
-                            }
-                            required
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="cardNumber">Card Number *</Label>
-                          <Input
-                            id="cardNumber"
-                            placeholder="1234 5678 9012 3456"
-                            value={paymentMethod.cardNumber || ""}
-                            onChange={(e) =>
-                              handlePaymentChange("cardNumber", e.target.value)
-                            }
-                            required
-                          />
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <Label htmlFor="expiryDate">Expiry Date *</Label>
-                            <Input
-                              id="expiryDate"
-                              placeholder="MM/YY"
-                              value={paymentMethod.expiryDate || ""}
-                              onChange={(e) =>
-                                handlePaymentChange("expiryDate", e.target.value)
-                              }
-                              required
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="cvv">CVV *</Label>
-                            <Input
-                              id="cvv"
-                              placeholder="123"
-                              value={paymentMethod.cvv || ""}
-                              onChange={(e) =>
-                                handlePaymentChange("cvv", e.target.value)
-                              }
-                              required
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    )}
+                
 
                   {paymentMethod.type === "tab" && (
                     <div className="space-y-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
                       <div className="flex items-center mb-2">
                         <Image
-                          src="/tab-logo.png"
-                          alt="Tab Payment"
+                          src="/images/contactless.png"
+                          alt="tap Payment"
                           width={60}
                           height={30}
                           className="mr-2"
                         />
-                        <h3 className="font-medium">Pay with Tab</h3>
+                        <h3 className="font-medium">Pay with tap</h3>
                       </div>
                       <p className="text-sm text-muted-foreground mb-4">
-                        You'll be redirected to Tab's secure payment page to complete your transaction.
+                        You'll be redirected to tap's secure payment page to complete your transaction.
                       </p>
                       <div className="space-y-2">
-                        
-                        
+
+
                         <p className="text-xs text-muted-foreground">
-                          This phone number should be registered with your Tab account
+                          This phone number should be registered with your tap account
                         </p>
                       </div>
                       <div className="bg-white p-3 rounded border text-sm">
-                        <p className="font-medium mb-1">How Tab payment works:</p>
+                        <p className="font-medium mb-1">How tap payment works:</p>
                         <ol className="list-decimal pl-5 space-y-1">
                           <li>Click "Review Order" to proceed</li>
-                          <li>You'll be redirected to Tab's secure payment portal</li>
-                          <li>Complete the payment using your Tab account</li>
+                          <li>You'll be redirected to tap's secure payment portal</li>
+                          <li>Complete the payment using your tap account</li>
                           <li>Return to this page to see your order confirmation</li>
                         </ol>
                       </div>
@@ -755,7 +683,7 @@ export default function CheckoutPage() {
                     </Button>
                     <Button
                       onClick={() => setCurrentStep(4)}
-                     
+
                       className="flex-1"
                     >
                       Review Order
@@ -795,25 +723,14 @@ export default function CheckoutPage() {
                         {paymentMethod.type === "cash"
                           ? "Cash On Delivery"
                           : paymentMethod.type === "tab"
-                            ? "Tab Payment"
+                            ? "tap Payment"
                             : paymentMethod.type}{" "}
                         Payment
                       </p>
-                      {paymentMethod.type === "credit" ||
-                        paymentMethod.type === "debit" ? (
+                      {
+                         paymentMethod.type === "tab" ? (
                         <>
-                          <p>
-                            Card ending in ****
-                            {paymentMethod.cardNumber?.slice(-4)}
-                          </p>
-                          <p>Expires {paymentMethod.expiryDate}</p>
-                        </>
-                      ) : paymentMethod.type === "tab" ? (
-                        <>
-                          <p>Phone: {paymentMethod.tabPhone}</p>
-                          <p className="text-sm text-blue-600 mt-2">
-                            You'll complete payment on Tab's secure platform
-                          </p>
+                          
                         </>
                       ) : null}
                     </div>
@@ -869,7 +786,7 @@ export default function CheckoutPage() {
                       {loading
                         ? "Placing Order..."
                         : paymentMethod.type === "tab"
-                          ? `Pay with Tab - ${formatPrice(total)}`
+                          ? `Pay with TaP - ${formatPrice(total)}`
                           : `Place Order - ${formatPrice(total)}`}
                     </Button>
                   </div>

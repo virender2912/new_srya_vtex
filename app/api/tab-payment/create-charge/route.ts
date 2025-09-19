@@ -19,6 +19,8 @@ export async function POST(req: Request) {
 
     const data = await response.json();
     console.log("Tap Response:", data);
+    console.log("Tab-Response-id:", data.id);
+    
 
     return NextResponse.json(data, { status: response.status });
   } catch (error: any) {
