@@ -126,12 +126,10 @@ export default function OrderPage({
       <div className="bg-white shadow rounded-lg p-6">
         {/* Order Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 border-b pb-4">
-        
           <div>
             <h1 className="text-2xl font-bold mb-1">
               Order #{order.orderId || "N/A"}
             </h1>
-           
           </div>
           <p className="text-gray-500 mt-2 sm:mt-0">
             Placed on:{" "}
@@ -239,7 +237,7 @@ export default function OrderPage({
                   {order.shippingData.address.city},{" "}
                   {order.shippingData.address.state}
                 </p>
-               
+
                 <p>
                   Postal Code: {order.shippingData.address.postalCode || "N/A"}
                 </p>
@@ -307,6 +305,16 @@ export default function OrderPage({
               order.storePreferencesData?.currencyCode
             )}
           </p>
+        </div>
+
+        <div className="p-4 rounded-md">
+          <Button
+            size="lg"
+            asChild
+            className="w-full bg-black text-white hover:bg-black/90"
+          >
+            <Link href="/">Continue Shopping</Link>
+          </Button>
         </div>
       </div>
     </div>

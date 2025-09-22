@@ -19,7 +19,6 @@ import { useCart } from "@/contexts/cart-context";
 import { useAuth } from "@/contexts/auth-context";
 import { formatPrice } from "@/lib/vtex-api";
 import { v4 as uuidv4 } from 'uuid';
-import { NextResponse } from "next/server";
 
 interface ShippingAddress {
   firstName: string;
@@ -334,7 +333,7 @@ export default function CheckoutPage() {
                 <Link target="blank" href={`/orders/${orderId}`}>View Order Details</Link>
               </Button>
               <Button variant="outline" size="lg" asChild>
-                <Link className="ml-3" href="/products">Continue Shopping</Link>
+                <Link className="ml-3" href="/">Continue Shopping</Link>
               </Button>
             </div>
           </div>
@@ -343,47 +342,47 @@ export default function CheckoutPage() {
     );
   }
 
-  if (tabPaymentInitiated) {
-    return (
-      <Layout>
-        <div className="container py-16">
-          <div className="max-w-2xl mx-auto text-center">
-            <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-8">
-              <ExternalLink className="h-10 w-10 text-blue-600" />
-            </div>
-            <h1 className="text-4xl font-bold mb-4">Complete Your Payment with Tap</h1>
-            <p className="text-xl text-muted-foreground mb-8">
-              You've been redirected to tap's secure payment portal to complete your transaction.
-              Please complete the payment process to confirm your order.
-            </p>
-            <div className="bg-gray-50 rounded-lg p-6 mb-8">
-              <p className="text-sm text-muted-foreground mb-2">Order Number</p>
-              <p className="text-2xl font-bold">{orderId}</p>
-              <p className="text-sm text-muted-foreground mt-4">
-                Amount: {formatPrice(total)}
-              </p>
-            </div>
-            <div className="space-y-4">
-              <Button size="lg" onClick={() => tabUrl && window.open(tabUrl, "_blank")}>
+  // if (tabPaymentInitiated) {
+  //   return (
+  //     <Layout>
+  //       <div className="container py-16">
+  //         <div className="max-w-2xl mx-auto text-center">
+  //           <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-8">
+  //             <ExternalLink className="h-10 w-10 text-blue-600" />
+  //           </div>
+  //           <h1 className="text-4xl font-bold mb-4">Complete Your Payment with Tap</h1>
+  //           <p className="text-xl text-muted-foreground mb-8">
+  //             You've been redirected to tap's secure payment portal to complete your transaction.
+  //             Please complete the payment process to confirm your order.
+  //           </p>
+  //           <div className="bg-gray-50 rounded-lg p-6 mb-8">
+  //             <p className="text-sm text-muted-foreground mb-2">Order Number</p>
+  //             <p className="text-2xl font-bold">{orderId}</p>
+  //             <p className="text-sm text-muted-foreground mt-4">
+  //               Amount: {formatPrice(total)}
+  //             </p>
+  //           </div>
+  //           <div className="space-y-4">
+  //             <Button size="lg" onClick={() => tabUrl && window.open(tabUrl, "_blank")}>
 
-                Open tap Payment Page
-              </Button>
-              <Button variant="outline" size="lg" className="ml-3" asChild>
-                <Link href="/account">View Order Status</Link>
-              </Button>
-            </div>
-            <div className="mt-8 p-4 bg-yellow-50 rounded-lg text-left">
-              <h3 className="font-medium mb-2">Important:</h3>
-              <p className="text-sm">
-                Your order will be processed once we receive confirmation of your payment from tap.
-                If you've already completed the payment, it may take a few minutes for the status to update.
-              </p>
-            </div>
-          </div>
-        </div>
-      </Layout>
-    );
-  }
+  //               Open tap Payment Page
+  //             </Button>
+  //             <Button variant="outline" size="lg" className="ml-3" asChild>
+  //               <Link href="/account">View Order Status</Link>
+  //             </Button>
+  //           </div>
+  //           <div className="mt-8 p-4 bg-yellow-50 rounded-lg text-left">
+  //             <h3 className="font-medium mb-2">Important:</h3>
+  //             <p className="text-sm">
+  //               Your order will be processed once we receive confirmation of your payment from tap.
+  //               If you've already completed the payment, it may take a few minutes for the status to update.
+  //             </p>
+  //           </div>
+  //         </div>
+  //       </div>
+  //     </Layout>
+  //   );
+  // }
 
   if (!authState.isAuthenticated || cartState.items.length === 0) {
     return null;
@@ -622,10 +621,10 @@ export default function CheckoutPage() {
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="tab" id="tab" />
                         <Label htmlFor="tab" className="flex items-center">
-                         Secure payment with Tap Payment
-                          <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                         Secure payment with Debit card / Credit card
+                          {/* <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
                             Debit card / Credit card
-                          </span>
+                          </span> */}
                         </Label>
                       </div>
                        
@@ -639,7 +638,7 @@ export default function CheckoutPage() {
 
                 
 
-                  {paymentMethod.type === "tab" && (
+                  {/* {paymentMethod.type === "tab" && (
                     <div className="space-y-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
                       <div className="flex items-center mb-2">
                         <Image
@@ -671,7 +670,7 @@ export default function CheckoutPage() {
                         </ol>
                       </div>
                     </div>
-                  )}
+                  )} */}
 
                   <div className="flex gap-4">
                     <Button
@@ -723,9 +722,9 @@ export default function CheckoutPage() {
                         {paymentMethod.type === "cash"
                           ? "Cash On Delivery"
                           : paymentMethod.type === "tab"
-                            ? "tap Payment"
+                            ? "Debit/Credit card"
                             : paymentMethod.type}{" "}
-                        Payment
+                        
                       </p>
                       {
                          paymentMethod.type === "tab" ? (
@@ -786,7 +785,7 @@ export default function CheckoutPage() {
                       {loading
                         ? "Placing Order..."
                         : paymentMethod.type === "tab"
-                          ? `Pay with TaP - ${formatPrice(total)}`
+                          ? `Pay with Tap - ${formatPrice(total)}`
                           : `Place Order - ${formatPrice(total)}`}
                     </Button>
                   </div>
